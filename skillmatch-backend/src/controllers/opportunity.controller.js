@@ -88,17 +88,46 @@ exports.deleteOpportunity = async (req, res) => {
 // Public
 exports.getOpportunities = async (req, res) => {
   try {
-    const opportunities = await Opportunity.find().sort({ createdAt: -1 });
+    const queryObj = { ...req.query };
+    const excludedFields = ["page", "sort", "limit", "fields", "search"];
+    excludedFields.forEach((el) => delete queryObj[el]);
+
+    let query = Opportunity.find(queryObj);
+
+    // Search
+    if (req.query.search) {
+      query = query.find({
+        title: { $regex: req.query.search, $options: "i" },
+      });
+    }
+
+    // Pagination
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 10;
+    const skip = (page - 1) * limit;
+
+    const total = await Opportunity.countDocuments(query.getQuery());
+
+    query = query.skip(skip).limit(limit);
+
+    const opportunities = await query;
+
+    // const opportunities = await Opportunity.find().sort({ createdAt: -1 });
 
     res.status(200).json({
       status: "success",
       results: opportunities.length,
+      total: total,
+      page: page,
       data: {
         opportunities,
       },
     });
   } catch (err) {
-    res.status(404).json({ status: "fail", message: "No opportunities found" });
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
   }
 };
 
