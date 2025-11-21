@@ -1,4 +1,7 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const userSchema = new mongoose.Schema(
   {
@@ -46,10 +49,56 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
     },
     profileImage: String,
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationCode: String,
+    verificationCodeExpires: Date,
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
   },
   {
     timestamps: true,
   }
 );
+
+// Pre-save middleware to hash password
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+
+  this.passwordConfirm = undefined;
+
+  next();
+});
+
+userSchema.pre("save", function (next) {
+  if (!this.isModified("password") || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+    return JWTTimestamp < changedTimestamp;
+  }
+  return false;
+};
 
 module.exports = mongoose.model("User", userSchema);
