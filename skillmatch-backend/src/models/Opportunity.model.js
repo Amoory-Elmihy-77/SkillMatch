@@ -1,55 +1,62 @@
 const mongoose = require("mongoose");
 
-const opportunitySchema = new mongoose.Schema(
+const OpportunitySchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, "Please add a title"],
+      required: [true, "Opportunity must have a title"],
       trim: true,
-    },
-    type: {
-      type: String,
-      required: [true, "Please select an opportunity type"],
-      enum: ["job", "course", "tool"],
+      maxlength: [100, "Title cannot be more than 100 characters"],
     },
     description: {
       type: String,
-      required: [true, "Please add a description"],
+      required: [true, "Opportunity must have a description"],
     },
-    skillsRequired: {
+    company: {
+      type: String,
+      required: [true, "Opportunity must be linked to a company"],
+      trim: true,
+    },
+    requiredSkills: {
+      type: [String],
+      required: [true, "Opportunity must list required skills"],
+      lowercase: true,
+    },
+    tags: {
       type: [String],
       default: [],
       lowercase: true,
     },
-    category: {
+    level: {
       type: String,
-      enum: [
-        "Web Dev",
-        "Design",
-        "Video Editing",
-        "Writing",
-        "Marketing",
-        "Other",
-      ],
-      default: "Other",
+      enum: ["junior", "mid", "senior", "internship"],
+      default: "junior",
     },
-    sourceName: String,
-    externalLink: {
+    type: {
       type: String,
-      required: [true, "Please add an external link"],
+      enum: ["full-time", "part-time", "contract", "remote"],
+      default: "full-time",
     },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-    viewsCount: {
+    salary: {
       type: Number,
       default: 0,
     },
+    createdBy: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
-    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
-module.exports = mongoose.model("Opportunity", opportunitySchema);
+// OpportunitySchema.index({ requiredSkills: 1, tags: 1 });
+
+module.exports = mongoose.model("Opportunity", OpportunitySchema);
