@@ -95,3 +95,58 @@ exports.updateMyPassword = async (req, res) => {
     res.status(500).json({ status: "error", message: err.message });
   }
 };
+
+// 4. Get Saved Opportunities
+exports.getSavedOpportunities = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate({
+      path: "savedOpportunities",
+      select: "title company requiredSkills tags salary level type", // تحديد الحقول المطلوبة
+    });
+
+    res.status(200).json({
+      status: "success",
+      results: user.savedOpportunities.length,
+      data: {
+        savedOpportunities: user.savedOpportunities,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({ status: "fail", message: err.message });
+  }
+};
+
+// 5. Update Skills and Interests
+exports.updateSkillsAndInterests = async (req, res) => {
+  try {
+    const { skills, interests, bio } = req.body;
+
+    const updateObject = {};
+    if (skills) updateObject.skills = skills;
+    if (interests) updateObject.interests = interests;
+    if (bio) updateObject.bio = bio;
+
+    if (Object.keys(updateObject).length === 0) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Please provide skills, interests, or bio to update.",
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      updateObject,
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json({
+      status: "success",
+      message: "Profile details updated successfully.",
+      data: {
+        user: updatedUser,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({ status: "fail", message: err.message });
+  }
+};

@@ -25,6 +25,15 @@ router.get("/me", userController.getMe);
 router.patch("/updateMe", userController.updateMe);
 router.patch("/updateMyPassword", userController.updateMyPassword);
 
+// Saved Opportunities
+router.get("/me/saved", userController.getSavedOpportunities);
+
+// Update Skills and Interests
+router.patch(
+  "/updateSkillsAndInterests",
+  userController.updateSkillsAndInterests
+);
+
 router.get(
   "/admin-dashboard",
   authMiddleware.authorize("admin"),

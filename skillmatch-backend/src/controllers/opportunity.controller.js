@@ -1,3 +1,4 @@
+const User = require("../models/User.model");
 const Opportunity = require("../models/Opportunity.model");
 
 const getUniqueArray = (arr) =>
@@ -206,5 +207,50 @@ exports.getRecommendedOpportunities = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ status: "error", message: err.message });
+  }
+};
+
+// Save or unsave an opportunity
+exports.saveOpportunity = async (req, res) => {
+  try {
+    const opportunityId = req.params.id;
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $addToSet: { savedOpportunities: opportunityId } },
+      { new: true }
+    );
+
+    res.status(200).json({
+      status: "success",
+      message: "Opportunity saved successfully.",
+      data: {
+        savedCount: user.savedOpportunities.length,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({ status: "fail", message: err.message });
+  }
+};
+
+exports.unsaveOpportunity = async (req, res) => {
+  try {
+    const opportunityId = req.params.id;
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $pull: { savedOpportunities: opportunityId } },
+      { new: true }
+    );
+
+    res.status(200).json({
+      status: "success",
+      message: "Opportunity unsaved successfully.",
+      data: {
+        savedCount: user.savedOpportunities.length,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({ status: "fail", message: err.message });
   }
 };

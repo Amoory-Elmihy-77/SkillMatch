@@ -15,6 +15,10 @@ router.route("/").get(opportunityController.getOpportunities);
 router.route("/:id").get(opportunityController.getOpportunity);
 
 router.use(authMiddleware.protect);
+
+router.post("/save/:id", opportunityController.saveOpportunity);
+router.delete("/unsave/:id", opportunityController.unsaveOpportunity);
+
 router.use(authMiddleware.authorize("admin"));
 
 router.route("/").post(opportunityController.createOpportunity);

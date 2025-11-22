@@ -48,6 +48,12 @@ const userSchema = new mongoose.Schema(
       default: [],
       lowercase: true,
     },
+    savedOpportunities: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Opportunity",
+      },
+    ],
     profileImage: String,
     isVerified: {
       type: Boolean,
