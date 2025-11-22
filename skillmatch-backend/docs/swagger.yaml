@@ -1,0 +1,392 @@
+openapi: 3.0.0
+info:
+  title: SkillMatch Job Recommendation API
+  version: 1.0.0
+  description: The complete API for managing job opportunities, personalized user profiles, and skill-based job recommendations, built on Node.js/Express and MongoDB.
+
+servers:
+  - url: http://localhost:4000/api
+    description: Local Development Server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        JWT Token required for all protected endpoints. 
+        Obtain this token via the /auth/login endpoint.
+
+  schemas:
+    Opportunity:
+      type: object
+      properties:
+        _id: { type: string, example: "60c72b1f9b1d4c001f8e4d12" }
+        title: { type: string, example: "Senior React Developer" }
+        description: { type: string, example: "Develop high-performance React applications using Redux." }
+        company: { type: string, example: "Innovatech Solutions" }
+        requiredSkills: { type: array, items: { type: string }, example: ["react", "redux", "typescript"] }
+        tags: { type: array, items: { type: string }, example: ["remote", "senior", "frontend"] }
+        level: { type: string, enum: [junior, mid, senior], example: "senior" }
+        salary: { type: number, example: 120000 }
+        createdBy: { type: string, description: "ID of the Admin user who created the job" }
+        createdAt: { type: string, format: date-time }
+        
+    User:
+      type: object
+      properties:
+        _id: { type: string, example: "60c72b1f9b1d4c001f8e4d01" }
+        name: { type: string, example: "Ahmed Ali" }
+        email: { type: string, example: "ahmed@example.com" }
+        skills: { type: array, items: { type: string }, example: ["javascript", "node.js", "mongodb"] }
+        interests: { type: array, items: { type: string }, example: ["backend", "cloud", "security"] }
+        isVerified: { type: boolean, example: true }
+        # role and active are intentionally omitted as they have select: false in the model
+        
+    AuthLoginBody:
+      type: object
+      properties:
+        email: { type: string, example: "user@example.com" }
+        password: { type: string, example: "Pass12345!" }
+        
+    AuthResponse:
+      type: object
+      properties:
+        status: { type: string, example: "success" }
+        token: { type: string, description: "The JWT token used for authentication." }
+        data:
+          type: object
+          properties:
+            user: { $ref: "#/components/schemas/User" }
+            
+    ErrorResponse:
+      type: object
+      properties:
+        status: { type: string, enum: [fail, error], example: "fail" }
+        message: { type: string, example: "Invalid email or password." }
+
+paths:
+# ====================================================================
+# I. AUTHENTICATION (PUBLIC)
+# ====================================================================
+  /auth/signup:
+    post:
+      tags: [I. Authentication]
+      summary: 1. Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string, example: "New User" }
+                email: { type: string, example: "new.user@example.com" }
+                password: { type: string, example: "StrongPass123!" }
+                passwordConfirm: { type: string, example: "StrongPass123!" }
+      responses:
+        '201': { description: "Registration successful! A verification code has been sent." }
+        '400': { content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } }
+
+  /auth/login:
+    post:
+      tags: [I. Authentication]
+      summary: 2. Login and get JWT Token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AuthLoginBody" }
+      responses:
+        '200': { description: "Successful login.", content: { "application/json": { schema: { $ref: "#/components/schemas/AuthResponse" } } } }
+        '401': { content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } }
+        
+  /auth/verify:
+    post:
+      tags: [I. Authentication]
+      summary: 3. Verify account using OTP code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string, example: "new.user@example.com" }
+                code: { type: string, example: "123456" }
+      responses:
+        '200': { description: "Account successfully activated.", content: { "application/json": { schema: { $ref: "#/components/schemas/AuthResponse" } } } }
+
+  /auth/forgotPassword:
+    post:
+      tags: [I. Authentication]
+      summary: 4. Send password reset code to email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string, example: "user@example.com" }
+      responses:
+        '200': { description: "Password recovery code sent." }
+        
+  /auth/resetPassword:
+    patch:
+      tags: [I. Authentication]
+      summary: 5. Reset password using the code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string, example: "user@example.com" }
+                code: { type: string, example: "123456" }
+                newPassword: { type: string, example: "NewStrongPass1!" }
+      responses:
+        '200': { description: "Password reset successfully." }
+
+# ====================================================================
+# II. USER PROFILE (PROTECTED)
+# ====================================================================
+  /users/me:
+    get:
+      tags: [II. User Profile]
+      summary: 1. Get current logged-in user details
+      security:
+        - BearerAuth: []
+      responses:
+        '200': { description: "Current user data." }
+        '401': { content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } }
+
+  /users/updateMe:
+    patch:
+      tags: [II. User Profile]
+      summary: 2. Update basic profile info (name, email)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string, example: "Ahmed Updated" }
+                email: { type: string, example: "updated.email@example.com" }
+      responses:
+        '200': { description: "Profile updated successfully." }
+
+  /users/updateMyPassword:
+    patch:
+      tags: [II. User Profile]
+      summary: 3. Update password for logged-in user
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                passwordCurrent: { type: string, example: "OldPass123!" }
+                password: { type: string, example: "NewPass456!" }
+                passwordConfirm: { type: string, example: "NewPass456!" }
+      responses:
+        '200': { description: "Password changed successfully." }
+
+  /users/updateSkillsAndInterests:
+    patch:
+      tags: [II. User Profile]
+      summary: 4. Update Skills and Interests (for recommendation engine)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                skills: { type: array, items: { type: string }, example: ["react", "node", "mongodb"] }
+                interests: { type: array, items: { type: string }, example: ["fullstack", "AI", "remote work"] }
+      responses:
+        '200': { description: "Skills and interests updated." }
+
+  /users/deleteMe:
+    delete:
+      tags: [II. User Profile]
+      summary: 5. Deactivate account (Soft Delete)
+      security:
+        - BearerAuth: []
+      responses:
+        '204': { description: "Account successfully deactivated. User will be logged out." }
+        '401': { content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } }
+
+
+# ====================================================================
+# III. OPPORTUNITIES - PUBLIC READ & SEARCH
+# ====================================================================
+  /opportunities:
+    get:
+      tags: [III. Opportunities - Public]
+      summary: 1. Get all opportunities with advanced querying
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, example: 1 }
+          description: Page number for pagination (default is 1).
+        - name: limit
+          in: query
+          schema: { type: integer, example: 10 }
+          description: Number of results per page (default is 10).
+        - name: search
+          in: query
+          schema: { type: string, example: "Node.js" }
+          description: Search opportunities by title (case-insensitive).
+        - name: level
+          in: query
+          schema: { type: string, enum: [junior, mid, senior], example: "senior" }
+          description: Filter opportunities by required experience level.
+        - name: sort
+          in: query
+          schema: { type: string, example: "-salary,createdAt" }
+          description: Sort results. Use '-' for descending (e.g., '-salary' for highest salary first).
+        - name: fields
+          in: query
+          schema: { type: string, example: "title,company,salary" }
+          description: Specify fields to include (e.g., 'title,company').
+      responses:
+        '200': { description: "List of filtered, sorted, and paginated opportunities." }
+
+  /opportunities/{id}:
+    get:
+      tags: [III. Opportunities - Public]
+      summary: 2. Get details for a single opportunity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, example: "60c72b1f9b1d4c001f8e4d12" }
+      responses:
+        '200': { description: "Details of the requested opportunity." }
+        '404': { content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } }
+
+  /opportunities/recommended:
+    get:
+      tags: [III. Opportunities - Public]
+      summary: 3. Get personalized recommended opportunities
+      security:
+        - BearerAuth: []
+      description: Returns opportunities prioritized based on the current user's skills and interests.
+      responses:
+        '200': { description: "List of opportunities ranked by relevance." }
+        '401': { content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } }
+        
+# ====================================================================
+# IV. OPPORTUNITIES - USER INTERACTION (PROTECTED)
+# ====================================================================
+  /users/me/saved:
+    get:
+      tags: [IV. Opportunities - Interaction]
+      summary: 1. Get all opportunities saved by the user
+      security:
+        - BearerAuth: []
+      responses:
+        '200': { description: "List of bookmarked opportunities." }
+        
+  /opportunities/save/{id}:
+    post:
+      tags: [IV. Opportunities - Interaction]
+      summary: 2. Save/Bookmark an opportunity
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, example: "60c72b1f9b1d4c001f8e4d12" }
+      responses:
+        '200': { description: "Opportunity saved successfully." }
+        
+  /opportunities/unsave/{id}:
+    delete:
+      tags: [IV. Opportunities - Interaction]
+      summary: 3. Unsave/Remove a bookmarked opportunity
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, example: "60c72b1f9b1d4c001f8e4d12" }
+      responses:
+        '200': { description: "Opportunity removed successfully." }
+
+# ====================================================================
+# V. OPPORTUNITIES - ADMIN CRUD (ROLE: ADMIN REQUIRED)
+# ====================================================================
+  /opportunities:
+    post:
+      tags: [V. Opportunities - Admin]
+      summary: 1. Create a new opportunity (Admin Only)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/Opportunity" }
+            example:
+              title: "New Job Posting"
+              description: "..."
+              company: "Admin Corp"
+              requiredSkills: ["react", "node"]
+              tags: ["fulltime"]
+              level: "mid"
+              salary: 80000
+      responses:
+        '201': { description: "Opportunity created successfully." }
+        '403': { description: "Forbidden: Not an Admin user." }
+
+  /opportunities/{id}:
+    patch:
+      tags: [V. Opportunities - Admin]
+      summary: 2. Update an existing opportunity (Admin Only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string, example: "Updated Job Title" }
+                salary: { type: number, example: 95000 }
+      responses:
+        '200': { description: "Opportunity updated successfully." }
+        '403': { description: "Forbidden: Not an Admin user." }
+    delete:
+      tags: [V. Opportunities - Admin]
+      summary: 3. Delete an opportunity (Admin Only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: "Opportunity deleted successfully." }
+        '403': { description: "Forbidden: Not an Admin user." }

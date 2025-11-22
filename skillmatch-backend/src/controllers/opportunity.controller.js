@@ -94,12 +94,20 @@ exports.getOpportunities = async (req, res) => {
     excludedFields.forEach((el) => delete queryObj[el]);
 
     let query = Opportunity.find(queryObj);
-
+    // Selection fields
     if (req.query.fields) {
       const fields = req.query.fields.split(",").join(" ");
       query = query.select(fields);
     } else {
       query = query.select("-__v");
+    }
+
+    // Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(",").join(" ");
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort("-createdAt");
     }
 
     // Search
