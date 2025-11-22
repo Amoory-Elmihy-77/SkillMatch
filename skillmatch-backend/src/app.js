@@ -11,10 +11,13 @@ const authRoutes = require("./routes/auth.routes");
 const opportunityRoutes = require("./routes/opportunity.routes");
 const adminRoutes = require("./routes/admin.routes");
 const { notFound, errorHandler } = require("./middlewares/error.middleware");
+const { limiter } = require("./middlewares/globalLimiting.middleware");
 
 const allowedOrigins = [process.env.FRONTEND_URL, process.env.LOCAL_URL];
 
 // Middlewares
+// Apply rate limiting to all requests
+app.use(limiter);
 app.use(express.static(path.join(__dirname, "..", "public")));
 app.use(
   cors({

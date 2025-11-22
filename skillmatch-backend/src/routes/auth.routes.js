@@ -4,14 +4,15 @@ const passwordController = require("../controllers/password.controller");
 const userController = require("../controllers/user.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
 const { uploadUserPhoto } = require("../middlewares/upload.middleware");
+const { authLimiter } = require("../middlewares/globalLimiting.middleware");
 
 const router = express.Router();
 
 // 1. Authentication
-router.post("/signup", authController.signup);
+router.post("/signup", authLimiter, authController.signup);
 router.post("/verify", authController.verifyAccount);
 router.post("/resendCode", authController.resendVerificationCode);
-router.post("/login", authController.login);
+router.post("/login", authLimiter, authController.login);
 
 // 2. Reset Password
 router.post("/forgotPassword", passwordController.forgotPassword);
