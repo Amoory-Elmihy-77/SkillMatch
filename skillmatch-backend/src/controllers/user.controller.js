@@ -164,3 +164,30 @@ exports.deactivateMe = async (req, res) => {
     res.status(400).json({ status: "fail", message: err.message });
   }
 };
+
+// 7. Update Profile Photo
+exports.updateProfilePhoto = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ status: "fail", message: "No photo uploaded." });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { photo: req.file.filename },
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json({
+      status: "success",
+      message: "Profile photo updated successfully.",
+      data: {
+        user: updatedUser,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ status: "error", message: err.message });
+  }
+};

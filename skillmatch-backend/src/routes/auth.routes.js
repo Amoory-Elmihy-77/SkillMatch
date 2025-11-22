@@ -3,6 +3,7 @@ const authController = require("../controllers/auth.controller");
 const passwordController = require("../controllers/password.controller");
 const userController = require("../controllers/user.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
+const { uploadUserPhoto } = require("../middlewares/upload.middleware");
 
 const router = express.Router();
 
@@ -24,6 +25,12 @@ router.use(authMiddleware.protect);
 router.get("/me", userController.getMe);
 router.patch("/updateMe", userController.updateMe);
 router.patch("/updateMyPassword", userController.updateMyPassword);
+
+router.patch(
+  "/updateMyPhoto",
+  uploadUserPhoto,
+  userController.updateProfilePhoto
+);
 
 // Saved Opportunities
 router.get("/me/saved", userController.getSavedOpportunities);

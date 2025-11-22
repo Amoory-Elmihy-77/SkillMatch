@@ -227,7 +227,27 @@ paths:
       responses:
         '204': { description: "Account successfully deactivated. User will be logged out." }
         '401': { content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } }
-
+  
+  /users/updateMyPhoto:
+    patch:
+      tags: [II. User Profile]
+      summary: 6. Update Profile Picture
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data: # 🔑 هام: يجب أن يكون multipart/form-data
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary # 🔑 يجب أن يكون binary
+                  description: The image file (max 5MB, jpeg/png).
+      responses:
+        '200': { description: "Profile photo updated successfully." }
+        '400': { description: "No photo uploaded or file type is incorrect." }
 
 # ====================================================================
 # III. OPPORTUNITIES - PUBLIC READ & SEARCH

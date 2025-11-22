@@ -5,6 +5,7 @@ const helmet = require("helmet");
 require("dotenv").config();
 const YAML = require("yamljs");
 const swaggerUi = require("swagger-ui-express");
+const path = require("path");
 
 const authRoutes = require("./routes/auth.routes");
 const opportunityRoutes = require("./routes/opportunity.routes");
@@ -14,6 +15,7 @@ const { notFound, errorHandler } = require("./middlewares/error.middleware");
 const allowedOrigins = [process.env.FRONTEND_URL, process.env.LOCAL_URL];
 
 // Middlewares
+app.use(express.static(path.join(__dirname, "..", "public")));
 app.use(
   cors({
     origin: function (origin, callback) {
