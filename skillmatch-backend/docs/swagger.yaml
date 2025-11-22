@@ -5,8 +5,8 @@ info:
   description: The complete API for managing job opportunities, personalized user profiles, and skill-based job recommendations, built on Node.js/Express and MongoDB.
 
 servers:
-  - url: http://localhost:4000/api
-    description: Local Development Server
+  - url: https://skillmatch-ej4r.onrender.com
+    description: Render Development Server
 
 components:
   securitySchemes:
@@ -32,7 +32,7 @@ components:
         salary: { type: number, example: 120000 }
         createdBy: { type: string, description: "ID of the Admin user who created the job" }
         createdAt: { type: string, format: date-time }
-        
+
     User:
       type: object
       properties:
