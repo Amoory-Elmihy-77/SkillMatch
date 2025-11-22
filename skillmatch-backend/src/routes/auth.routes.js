@@ -34,6 +34,9 @@ router.patch(
   userController.updateSkillsAndInterests
 );
 
+// Deactivate Account
+router.delete("/deleteMe", userController.deactivateMe);
+
 router.get(
   "/admin-dashboard",
   authMiddleware.authorize("admin"),

@@ -21,11 +21,12 @@ exports.protect = async (req, res, next) => {
 
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-    const currentUser = await User.findById(decoded.id);
+    const currentUser = await User.findById({ _id: decoded.id, active: true });
     if (!currentUser) {
       return res.status(401).json({
         status: "fail",
-        message: "The user associated with this token no longer exists.",
+        message:
+          "The user associated with this token no longer exists or the account is deactivated.",
       });
     }
 

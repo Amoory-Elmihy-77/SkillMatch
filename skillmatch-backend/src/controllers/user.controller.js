@@ -150,3 +150,17 @@ exports.updateSkillsAndInterests = async (req, res) => {
     res.status(400).json({ status: "fail", message: err.message });
   }
 };
+
+// 6. Deactivate My Account
+exports.deactivateMe = async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.user.id, { active: false });
+
+    res.status(204).json({
+      status: "success",
+      data: null,
+    });
+  } catch (err) {
+    res.status(400).json({ status: "fail", message: err.message });
+  }
+};
