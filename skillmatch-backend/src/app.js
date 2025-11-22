@@ -8,6 +8,7 @@ const swaggerUi = require("swagger-ui-express");
 
 const authRoutes = require("./routes/auth.routes");
 const opportunityRoutes = require("./routes/opportunity.routes");
+const adminRoutes = require("./routes/admin.routes");
 const { notFound, errorHandler } = require("./middlewares/error.middleware");
 
 const allowedOrigins = [process.env.FRONTEND_URL, process.env.LOCAL_URL];
@@ -38,6 +39,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/opportunities", opportunityRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.get("/", (req, res) => {
   res.send("SkillMatch Backend API is running!");

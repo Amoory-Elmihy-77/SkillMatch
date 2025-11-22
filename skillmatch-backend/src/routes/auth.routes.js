@@ -37,14 +37,4 @@ router.patch(
 // Deactivate Account
 router.delete("/deleteMe", userController.deactivateMe);
 
-router.get(
-  "/admin-dashboard",
-  authMiddleware.authorize("admin"),
-  (req, res) => {
-    res
-      .status(200)
-      .json({ status: "success", message: "Welcome to the Admin Dashboard!" });
-  }
-);
-
 module.exports = router;

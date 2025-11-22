@@ -390,3 +390,139 @@ paths:
       responses:
         '204': { description: "Opportunity deleted successfully." }
         '403': { description: "Forbidden: Not an Admin user." }
+# ====================================================================
+# V. ADMIN MANAGEMENT (ROLE: ADMIN REQUIRED)
+# ====================================================================
+  /admin/dashboard:
+    get:
+      tags: [V. Admin Management]
+      summary: 1. Get Admin Dashboard Stats
+      security:
+        - BearerAuth: []
+      description: Returns key metrics and counts (e.g., total users, total opportunities).
+      responses:
+        '200': 
+          description: Dashboard data loaded successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: "success" }
+                  data:
+                    type: object
+                    properties:
+                      totalActiveUsers: { type: integer, example: 500 }
+                      totalOpportunities: { type: integer, example: 1200 }
+        '403': { description: "Forbidden: Not authorized as an Admin." }
+
+# ----------------------------------------------------
+# A. Users Management
+# ----------------------------------------------------
+  /admin/users:
+    get:
+      tags: [V. Admin Management]
+      summary: 2. Get All Users (for Admin List)
+      security:
+        - BearerAuth: []
+      description: Retrieves a list of all users in the system, including 'active' status.
+      responses:
+        '200': { description: "List of all users." }
+    
+  /admin/users/{id}:
+    patch:
+      tags: [V. Admin Management]
+      summary: 3. Update User by ID (Admin Only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string, example: "Updated User Name" }
+                role: { type: string, enum: [user, admin], example: "admin" }
+                active: { type: boolean, example: false, description: "To deactivate/reactivate a user." }
+      responses:
+        '200': { description: "User updated successfully." }
+        '403': { description: "Forbidden: Not authorized as an Admin." }
+    delete:
+      tags: [V. Admin Management]
+      summary: 4. Hard Delete User by ID (Admin Only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: "User deleted successfully (No Content)." }
+        '403': { description: "Forbidden: Not authorized as an Admin." }
+
+# ----------------------------------------------------
+# B. Opportunities Management (CRUD)
+# ----------------------------------------------------
+  /admin/opportunities:
+    get:
+      tags: [V. Admin Management]
+      summary: 5. Get All Opportunities (Admin View)
+      security:
+        - BearerAuth: []
+      description: Full list of opportunities, typically with more details than the public endpoint. Supports public query params (search, sort, filter).
+      responses:
+        '200': { description: "List of all opportunities." }
+    post:
+      tags: [V. Admin Management]
+      summary: 6. Create New Opportunity (Admin Only)
+      security:
+        - BearerAuth: []
+      # ... (Add Opportunity Schema details here if not done already)
+      responses:
+        '201': { description: "Opportunity created successfully." }
+
+  /admin/opportunities/{id}:
+    get:
+      tags: [V. Admin Management]
+      summary: 7. Get Single Opportunity Detail (Admin View)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: "Opportunity details." }
+    patch:
+      tags: [V. Admin Management]
+      summary: 8. Update Opportunity by ID (Admin Only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      # ... (Add request body for update)
+      responses:
+        '200': { description: "Opportunity updated successfully." }
+    delete:
+      tags: [V. Admin Management]
+      summary: 9. Delete Opportunity by ID (Admin Only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: "Opportunity deleted successfully." }
