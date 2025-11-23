@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import api from "@/lib/axios";
 
 interface LoginState {
@@ -112,7 +111,7 @@ const LoginPage = () => {
                   Password
                 </label>
                 <a
-                  href="/forgot-password"
+                  href="/forgot"
                   className="text-sm text-indigo-600 hover:text-indigo-500"
                 >
                   Forgot Password?

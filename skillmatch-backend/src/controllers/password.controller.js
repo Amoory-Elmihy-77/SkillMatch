@@ -18,31 +18,27 @@ exports.forgotPassword = async (req, res) => {
 
     user.passwordResetToken = resetCode;
     user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
     await user.save({ validateBeforeSave: false });
 
     const message = `\nYour password reset code for SkillMatch is: ${resetCode}\n\nThis code is valid for 10 minutes only.`;
 
-    try {
-      await sendEmail({
-        email: user.email,
-        subject: "Password recovery code - SkillMatch",
-        message,
-      });
+    res.status(200).json({
+      status: "success",
+      message: "If the user exists, a password recovery code is being sent.",
+    });
 
-      res.status(200).json({
-        status: "success",
-        message: "A password recovery code has been sent to your email.",
-      });
-    } catch (err) {
+    sendEmail({
+      email: user.email,
+      subject: "Password recovery code - SkillMatch",
+      message,
+    }).catch(async (err) => {
+      console.log("Password reset email failed:", err);
+
       user.passwordResetToken = undefined;
       user.passwordResetExpires = undefined;
       await user.save({ validateBeforeSave: false });
-
-      res.status(500).json({
-        status: "error",
-        message: "There was an error sending the recovery email.",
-      });
-    }
+    });
   } catch (err) {
     res.status(500).json({ status: "error", message: err.message });
   }

@@ -1,37 +1,59 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import api from "@/lib/axios";
 
-const VerifyPage = () => {
+const ResetPasswordPage = () => {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const searchParams = useSearchParams();
+
+  const initialEmail = searchParams.get("email") || "";
+
+  const [email, setEmail] = useState(initialEmail);
   const [code, setCode] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const handleVerify = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccessMessage(null);
 
+    if (password !== passwordConfirm) {
+      setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
+    if (!email || !code || !password || !passwordConfirm) {
+      setError(
+        "Please fill in all required fields (Email, Code, New Password)."
+      );
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await api.post("/auth/verify", {
-        email: email,
-        code: code,
+      const response = await api.patch("/auth/resetPassword", {
+        email,
+        code,
+        newPassword: password,
+        passwordConfirm: passwordConfirm,
       });
 
-      const token = response.data.token;
-      if (token) {
+      const jwtToken = response.data.token;
+      if (jwtToken) {
         if (typeof window !== "undefined") {
-          localStorage.setItem("jwt", token);
+          localStorage.setItem("jwt", jwtToken);
         }
         setSuccessMessage(
-          "Account successfully verified! Redirecting to login..."
+          "Password successfully reset! You are now logged in and redirecting..."
         );
 
         setTimeout(() => {
@@ -42,38 +64,11 @@ const VerifyPage = () => {
       if (axios.isAxiosError(err)) {
         const errorMessage =
           err.response?.data?.message ||
-          "Verification failed. Invalid code or email.";
+          "Password reset failed. Please check your email and code.";
         setError(errorMessage);
       } else {
-        setError("An unexpected error occurred during verification.");
+        setError("An unexpected error occurred during password reset.");
       }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResendCode = async () => {
-    if (!email) {
-      setError("Please enter your email to resend the code.");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    setSuccessMessage(null);
-
-    try {
-      await api.post("/auth/resendCode", { email });
-      setSuccessMessage("New verification code has been sent to your email.");
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const errorMessage =
-          err.response?.data?.message || "Failed to resend code.";
-        setError(errorMessage);
-      } else {
-        setError("An unexpected error occurred.");
-      }
-    } finally {
       setLoading(false);
     }
   };
@@ -84,11 +79,10 @@ const VerifyPage = () => {
         <div className="text-center mb-8">
           <span className="text-3xl font-bold text-indigo-600">SkillMatch</span>
           <h1 className="text-2xl font-semibold text-gray-800 mt-4">
-            Activate Your Account
+            Set New Password
           </h1>
           <p className="text-gray-500 text-sm mt-2">
-            A verification code was sent to your email. Enter the code to
-            activate your account.
+            Enter the code from your email and set your new password.
           </p>
         </div>
 
@@ -103,7 +97,7 @@ const VerifyPage = () => {
           </div>
         )}
 
-        <form onSubmit={handleVerify} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label
               htmlFor="email"
@@ -119,6 +113,7 @@ const VerifyPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              disabled={!!searchParams.get("email")}
             />
           </div>
 
@@ -127,7 +122,7 @@ const VerifyPage = () => {
               htmlFor="code"
               className="block text-sm font-medium text-gray-700"
             >
-              Verification Code (6 digits)
+              6-Digit Reset Code
             </label>
             <input
               id="code"
@@ -135,9 +130,45 @@ const VerifyPage = () => {
               type="text"
               required
               value={code}
-              onChange={(e) => setCode(e.target.value.substring(0, 6))} // 🔑 تحديد 6 أرقام
+              onChange={(e) => setCode(e.target.value.substring(0, 6))}
               maxLength={6}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-center tracking-widest text-lg font-bold text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
+              New Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="passwordConfirm"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Confirm New Password
+            </label>
+            <input
+              id="passwordConfirm"
+              name="passwordConfirm"
+              type="password"
+              required
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             />
           </div>
 
@@ -150,22 +181,12 @@ const VerifyPage = () => {
                 : "bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             }`}
           >
-            {loading ? "Verifying..." : "Verify Account"}
+            {loading ? "Resetting Password..." : "Reset Password"}
           </button>
         </form>
-
-        <div className="mt-4 text-center">
-          <button
-            onClick={handleResendCode}
-            disabled={loading || !email}
-            className="text-sm font-medium text-indigo-600 hover:text-indigo-500 disabled:text-gray-400 disabled:cursor-not-allowed"
-          >
-            Resend Verification Code
-          </button>
-        </div>
       </div>
     </div>
   );
 };
 
-export default VerifyPage;
+export default ResetPasswordPage;

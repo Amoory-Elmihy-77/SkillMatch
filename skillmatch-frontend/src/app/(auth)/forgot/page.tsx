@@ -5,75 +5,39 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import api from "@/lib/axios";
 
-const VerifyPage = () => {
+const ForgotPasswordPage = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const handleVerify = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccessMessage(null);
 
     try {
-      const response = await api.post("/auth/verify", {
-        email: email,
-        code: code,
-      });
+      const response = await api.post("/auth/forgotPassword", { email });
 
-      const token = response.data.token;
-      if (token) {
-        if (typeof window !== "undefined") {
-          localStorage.setItem("jwt", token);
-        }
-        setSuccessMessage(
-          "Account successfully verified! Redirecting to login..."
-        );
+      setSuccessMessage(
+        response.data.message ||
+          "Password reset code sent! Please check your email and proceed to reset page."
+      );
 
-        setTimeout(() => {
-          router.push("/login");
-        }, 2000);
-      }
+      setTimeout(() => {
+        router.push(`/reset?email=${encodeURIComponent(email)}`);
+      }, 1500);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const errorMessage =
           err.response?.data?.message ||
-          "Verification failed. Invalid code or email.";
+          "Failed to process request. Please check the email address.";
         setError(errorMessage);
       } else {
-        setError("An unexpected error occurred during verification.");
+        setError("An unexpected error occurred. Please try again.");
       }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResendCode = async () => {
-    if (!email) {
-      setError("Please enter your email to resend the code.");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    setSuccessMessage(null);
-
-    try {
-      await api.post("/auth/resendCode", { email });
-      setSuccessMessage("New verification code has been sent to your email.");
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const errorMessage =
-          err.response?.data?.message || "Failed to resend code.";
-        setError(errorMessage);
-      } else {
-        setError("An unexpected error occurred.");
-      }
-    } finally {
       setLoading(false);
     }
   };
@@ -84,11 +48,10 @@ const VerifyPage = () => {
         <div className="text-center mb-8">
           <span className="text-3xl font-bold text-indigo-600">SkillMatch</span>
           <h1 className="text-2xl font-semibold text-gray-800 mt-4">
-            Activate Your Account
+            Forgot Password?
           </h1>
           <p className="text-gray-500 text-sm mt-2">
-            A verification code was sent to your email. Enter the code to
-            activate your account.
+            Enter your email address to receive the password reset code.
           </p>
         </div>
 
@@ -103,7 +66,7 @@ const VerifyPage = () => {
           </div>
         )}
 
-        <form onSubmit={handleVerify} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label
               htmlFor="email"
@@ -122,25 +85,6 @@ const VerifyPage = () => {
             />
           </div>
 
-          <div>
-            <label
-              htmlFor="code"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Verification Code (6 digits)
-            </label>
-            <input
-              id="code"
-              name="code"
-              type="text"
-              required
-              value={code}
-              onChange={(e) => setCode(e.target.value.substring(0, 6))} // 🔑 تحديد 6 أرقام
-              maxLength={6}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-center tracking-widest text-lg font-bold text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
-          </div>
-
           <button
             type="submit"
             disabled={loading}
@@ -150,22 +94,29 @@ const VerifyPage = () => {
                 : "bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             }`}
           >
-            {loading ? "Verifying..." : "Verify Account"}
+            {loading ? "Sending Request..." : "Send Reset Code"}
           </button>
         </form>
 
         <div className="mt-4 text-center">
-          <button
-            onClick={handleResendCode}
-            disabled={loading || !email}
-            className="text-sm font-medium text-indigo-600 hover:text-indigo-500 disabled:text-gray-400 disabled:cursor-not-allowed"
+          <a
+            href="/reset"
+            className="text-sm font-medium text-gray-600 hover:text-gray-800"
           >
-            Resend Verification Code
-          </button>
+            Already have a code? Reset Password
+          </a>
+        </div>
+        <div className="mt-2 text-center">
+          <a
+            href="/login"
+            className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+          >
+            Back to Login
+          </a>
         </div>
       </div>
     </div>
   );
 };
 
-export default VerifyPage;
+export default ForgotPasswordPage;
