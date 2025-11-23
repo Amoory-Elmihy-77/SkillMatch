@@ -1,5 +1,4 @@
 const express = require("express");
-const app = express();
 const cors = require("cors");
 const helmet = require("helmet");
 require("dotenv").config();
@@ -12,6 +11,10 @@ const opportunityRoutes = require("./routes/opportunity.routes");
 const adminRoutes = require("./routes/admin.routes");
 const { notFound, errorHandler } = require("./middlewares/error.middleware");
 const { limiter } = require("./middlewares/globalLimiting.middleware");
+
+const app = express();
+// Trust first proxy for rate limiting behind proxies (e.g., Heroku, Nginx)
+app.set("trust proxy", 1);
 
 const allowedOrigins = [process.env.FRONTEND_URL, process.env.LOCAL_URL];
 
