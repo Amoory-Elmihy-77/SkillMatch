@@ -57,30 +57,27 @@ exports.signup = async (req, res) => {
 
     const message = `Hello ${username},\n\nYour activation code for SkillMatch is:\n${verifyCode}\n\nThis code is valid for 10 minutes.`;
 
-    try {
-      await sendEmail({
-        email: newUser.email,
-        subject: "Account activation code - SkillMatch",
-        message: message,
-      });
+    // response before sending email
+    res.status(201).json({
+      status: "success",
+      message:
+        "Registration successful! The verification code is being sent to your email.",
+    });
 
-      res.status(201).json({
-        status: "success",
-        message:
-          "Registration successful! Please check your email for the verification code.",
-      });
-    } catch (err) {
+    // send verification email without blocking response (await)
+    sendEmail({
+      email: newUser.email,
+      subject: "Account activation code - SkillMatch",
+      message: message,
+    }).catch(async (err) => {
+      console.log("Email sending failed:", err);
+
       newUser.verificationCode = undefined;
       newUser.verificationCodeExpires = undefined;
       await newUser.save({ validateBeforeSave: false });
-
-      res.status(500).json({
-        status: "error",
-        message:
-          "User created, but failed to send verification email. Please try to resend the code.",
-      });
-    }
+    });
   } catch (err) {
+    console.log(err);
     res.status(400).json({ status: "fail", message: err.message });
   }
 };
@@ -143,23 +140,18 @@ exports.resendVerificationCode = async (req, res) => {
 
     const message = `Your new activation code is:\n${newCode}`;
 
-    try {
-      await sendEmail({
-        email: user.email,
-        subject: "New activation code - SkillMatch",
-        message,
-      });
+    res.status(200).json({
+      status: "success",
+      message: "A new verification code is being sent to your email.",
+    });
 
-      res.status(200).json({
-        status: "success",
-        message: "A new code has been sent to your email.",
-      });
-    } catch (err) {
-      res.status(500).json({
-        status: "error",
-        message: "Failed to send the new code email.",
-      });
-    }
+    sendEmail({
+      email: user.email,
+      subject: "New activation code - SkillMatch",
+      message,
+    }).catch((err) => {
+      console.log("Failed to send the new code email:", err);
+    });
   } catch (err) {
     res.status(500).json({ status: "error", message: err.message });
   }
