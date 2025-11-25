@@ -1,18 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import api from '../../services/api';
-import { Users, Trash2, Search, MoreVertical, LayoutDashboard, Briefcase, BarChart2, LogOut } from 'lucide-react';
-import Loader from '../../components/Loader';
-import toast from 'react-hot-toast';
-import { useAuth } from '../../contexts/AuthContext';
-import { getUserAvatarUrl } from '../../utils/avatar';
-import logo from '../../assets/logo.png';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import api from "../../services/api";
+import {
+  Users,
+  Trash2,
+  Search,
+  MoreVertical,
+  LayoutDashboard,
+  Briefcase,
+  BarChart2,
+  LogOut,
+} from "lucide-react";
+import Loader from "../../components/Loader";
+import toast from "react-hot-toast";
+import { useAuth } from "../../contexts/AuthContext";
+import { getUserAvatarUrl } from "../../utils/avatar";
+import logo from "../../assets/logo.png";
 
 const AdminUsers = () => {
   const { logout, user: currentUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchUsers();
@@ -20,31 +29,36 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await api.get('/admin/users');
+      const response = await api.get("/admin/users");
       setUsers(response.data.data.users);
     } catch (error) {
-      console.error('Failed to fetch users', error);
-      toast.error('Failed to load users');
+      console.error("Failed to fetch users", error);
+      toast.error("Failed to load users");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteUser = async (userId) => {
-    if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this user? This action cannot be undone."
+      )
+    ) {
       try {
         await api.delete(`/admin/users/${userId}`);
-        setUsers(users.filter(user => user._id !== userId));
-        toast.success('User deleted successfully');
-      } catch (error) {
-        toast.error('Failed to delete user');
+        setUsers(users.filter((user) => user._id !== userId));
+        toast.success("User deleted successfully");
+      } catch {
+        toast.error("Failed to delete user");
       }
     }
   };
 
-  const filteredUsers = users.filter(user => 
-    user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) return <Loader />;
@@ -55,25 +69,43 @@ const AdminUsers = () => {
       <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col min-h-full">
         <div className="p-6 border-b border-gray-200">
           <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="SkillMatch Logo" className="w-8 h-8 rounded-lg" />
-            <span className="text-xl font-bold text-primary-600">SkillMatch</span>
+            <img
+              src={logo}
+              alt="SkillMatch Logo"
+              className="w-8 h-8 rounded-lg"
+            />
+            <span className="text-xl font-bold text-primary-600">
+              SkillMatch
+            </span>
           </Link>
         </div>
-        
+
         <nav className="flex-1 p-4 space-y-1">
-          <Link to="/admin/dashboard" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition-colors">
+          <Link
+            to="/admin/dashboard"
+            className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition-colors"
+          >
             <LayoutDashboard className="w-5 h-5" />
             Overview
           </Link>
-          <Link to="/admin/users" className="flex items-center gap-3 px-4 py-3 bg-primary-50 text-primary-700 rounded-lg font-medium">
+          <Link
+            to="/admin/users"
+            className="flex items-center gap-3 px-4 py-3 bg-primary-50 text-primary-700 rounded-lg font-medium"
+          >
             <Users className="w-5 h-5" />
             Users Management
           </Link>
-          <Link to="/admin/opportunities" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition-colors">
+          <Link
+            to="/admin/opportunities"
+            className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition-colors"
+          >
             <Briefcase className="w-5 h-5" />
             Opportunities
           </Link>
-          <Link to="#" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition-colors">
+          <Link
+            to="#"
+            className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition-colors"
+          >
             <BarChart2 className="w-5 h-5" />
             Reports
           </Link>
@@ -81,17 +113,19 @@ const AdminUsers = () => {
 
         <div className="p-4 border-t border-gray-200 mt-auto">
           <div className="flex items-center gap-3 mb-4 px-4">
-            <img 
-              src={getUserAvatarUrl(currentUser)} 
-              alt="Admin" 
+            <img
+              src={getUserAvatarUrl(currentUser)}
+              alt="Admin"
               className="w-10 h-10 rounded-full object-cover"
             />
             <div>
-              <p className="text-sm font-bold text-gray-900">{currentUser?.username}</p>
+              <p className="text-sm font-bold text-gray-900">
+                {currentUser?.username}
+              </p>
               <p className="text-xs text-gray-500">Admin User</p>
             </div>
           </div>
-          <button 
+          <button
             onClick={() => logout()}
             className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:text-red-600 transition-colors w-full"
           >
@@ -105,8 +139,12 @@ const AdminUsers = () => {
       <main className="flex-1 md:ml-64 p-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Users Management</h1>
-            <p className="text-gray-500 mt-1">Manage and view all registered users.</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Users Management
+            </h1>
+            <p className="text-gray-500 mt-1">
+              Manage and view all registered users.
+            </p>
           </div>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -126,16 +164,28 @@ const AdminUsers = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   User
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Role
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Status
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Joined
                 </th>
                 <th scope="col" className="relative px-6 py-3">
@@ -149,16 +199,30 @@ const AdminUsers = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
-                        <img className="h-10 w-10 rounded-full object-cover" src={getUserAvatarUrl(user)} alt="" />
+                        <img
+                          className="h-10 w-10 rounded-full object-cover"
+                          src={getUserAvatarUrl(user)}
+                          alt=""
+                        />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{user.username}</div>
-                        <div className="text-sm text-gray-500">{user.email}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {user.username}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {user.email}
+                        </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'}`}>
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        user.role === "admin"
+                          ? "bg-purple-100 text-purple-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
+                    >
                       {user.role}
                     </span>
                   </td>
@@ -168,10 +232,12 @@ const AdminUsers = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(user.createdAt || Date.now()).toLocaleDateString()}
+                    {new Date(
+                      user.createdAt || Date.now()
+                    ).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button 
+                    <button
                       onClick={() => handleDeleteUser(user._id)}
                       className="text-red-600 hover:text-red-900"
                     >
