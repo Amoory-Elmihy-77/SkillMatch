@@ -22,8 +22,6 @@ const Home = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      // Mocking stats for now as API might not provide them directly in /me
-      // In a real app, we'd fetch these from a dashboard endpoint
       setStats({
         applied: 12,
         saved: user?.savedOpportunities?.length || 0,
@@ -32,9 +30,16 @@ const Home = () => {
       });
 
       const response = await api.get('/opportunities/recommended');
-      setRecommended((response.data.data.opportunities || []).slice(0, 4));
+      
+      const opportunities = response.data.data?.recommendedOpportunities || response.data.data?.opportunities || [];
+      
+      setRecommended(opportunities.slice(0, 4));
     } catch (error) {
-      console.error('Failed to fetch dashboard data', error);
+      if (error.response?.status !== 401) {
+        console.error('Failed to fetch dashboard data', error);
+        console.error('Error details:', error.response?.data);
+      }
+      setRecommended([]);
     } finally {
       setLoading(false);
     }

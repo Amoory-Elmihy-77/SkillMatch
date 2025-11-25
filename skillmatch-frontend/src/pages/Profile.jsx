@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { User, Mail, MapPin, Briefcase, Edit2, Save, X, Camera, Plus } from 'lucide-react';
+import { getUserAvatarUrl } from '../utils/avatar';
 import toast from 'react-hot-toast';
 
 const Profile = () => {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, setUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -30,6 +33,42 @@ const Profile = () => {
       });
     }
   }, [user]);
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size should be less than 5MB');
+      return;
+    }
+
+    setUploading(true);
+    const formDataToSend = new FormData();
+    formDataToSend.append('photo', file);
+
+    try {
+      const response = await api.patch('/auth/updateMyPhoto', formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      setUser(response.data.data.user);
+      toast.success('Profile photo updated successfully!');
+    } catch (error) {
+      console.error('Photo upload failed:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to upload photo';
+      toast.error(errorMessage);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -84,12 +123,24 @@ const Profile = () => {
               <div className="relative">
                 <div className="w-24 h-24 rounded-full bg-white p-1 shadow-md">
                   <img
-                    src={user?.photo || `https://ui-avatars.com/api/?name=${user?.username}&background=random`}
+                    src={getUserAvatarUrl(user)}
                     alt="Profile"
                     className="w-full h-full rounded-full object-cover"
                   />
                 </div>
-                <button className="absolute bottom-0 right-0 p-1.5 bg-white rounded-full shadow-sm border border-gray-200 text-gray-600 hover:text-primary-600">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                />
+                <button 
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="absolute bottom-0 right-0 p-1.5 bg-white rounded-full shadow-sm border border-gray-200 text-gray-600 hover:text-primary-600 disabled:opacity-50"
+                  title="Change profile photo"
+                >
                   <Camera className="w-4 h-4" />
                 </button>
               </div>

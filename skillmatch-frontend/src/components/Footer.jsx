@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../assets/logo.png';
 
 const Footer = () => {
   return (
@@ -8,9 +9,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div className="col-span-1 md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                <div className="w-4 h-4 border-2 border-white rounded-full"></div>
-              </div>
+              <img src={logo} alt="SkillMatch Logo" className="w-8 h-8 rounded-lg" />
               <span className="text-xl font-bold text-primary-600">SkillMatch</span>
             </Link>
             <p className="text-gray-500 text-sm">

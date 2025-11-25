@@ -13,13 +13,24 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const fetchMe = async () => {
       const token = localStorage.getItem('token');
+      console.log('Token from localStorage:', token ? 'exists' : 'not found');
+      
       if (token) {
         try {
           const response = await api.get('/auth/me');
-          setUser(response.data.data.user);
+          console.log('User fetched successfully:', response.data);
+          setUser(response.data.data?.user || response.data.user);
         } catch (error) {
-          console.error('Failed to fetch user', error);
-          localStorage.removeItem('token');
+          console.error('Failed to fetch user:', error.response?.status, error.response?.data);
+          
+          // Only remove token if it's actually invalid (401)
+          // Don't remove on network errors or other issues
+          if (error.response?.status === 401) {
+            console.log('Token is invalid, removing from localStorage');
+            localStorage.removeItem('token');
+          } else {
+            console.log('Network or server error, keeping token');
+          }
         }
       }
       setLoading(false);
@@ -31,7 +42,22 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await api.post('/auth/login', { email, password });
-      const { token, user } = response.data;
+      
+      console.log('Login response:', response.data);
+      
+      // API returns: { status: 'success', token: '...', data: { user: {...} } }
+      const token = response.data.token;
+      const user = response.data.data?.user || response.data.user;
+      
+      console.log('Extracted user:', user);
+      console.log('User role:', user?.role);
+      
+      if (!token) {
+        console.error('No token found in response! Response structure:', response.data);
+        toast.error('Login failed: No token received');
+        return false;
+      }
+      
       localStorage.setItem('token', token);
       setUser(user);
       toast.success('Logged in successfully!');
@@ -94,6 +120,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    setUser,
     loading,
     login,
     signup,

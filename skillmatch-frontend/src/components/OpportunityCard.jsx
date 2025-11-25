@@ -1,34 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Bookmark, MapPin, Clock, DollarSign } from 'lucide-react';
-import api from '../services/api';
-import toast from 'react-hot-toast';
-import { useAuth } from '../contexts/AuthContext';
+import { MapPin, Clock, DollarSign } from 'lucide-react';
 
-const OpportunityCard = ({ opportunity, onSaveToggle }) => {
-  const { user } = useAuth();
-  const isSaved = user?.savedOpportunities?.includes(opportunity._id);
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-    if (!user) {
-      toast.error('Please login to save opportunities');
-      return;
-    }
-    try {
-      if (isSaved) {
-        await api.delete(`/opportunities/unsave/${opportunity._id}`);
-        toast.success('Opportunity removed from saved');
-      } else {
-        await api.post(`/opportunities/save/${opportunity._id}`);
-        toast.success('Opportunity saved');
-      }
-      if (onSaveToggle) onSaveToggle();
-    } catch (error) {
-      toast.error('Failed to update saved status');
-    }
-  };
-
+const OpportunityCard = ({ opportunity }) => {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start mb-4">
@@ -79,25 +53,12 @@ const OpportunityCard = ({ opportunity, onSaveToggle }) => {
         </div>
       </div>
 
-      <div className="flex gap-3">
-        <button
-          onClick={handleSave}
-          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
-            isSaved
-              ? 'bg-primary-50 text-primary-700 border-primary-200 hover:bg-primary-100'
-              : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
-          }`}
-        >
-          <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
-          {isSaved ? 'Saved' : 'Save'}
-        </button>
-        <Link
-          to={`/opportunities/${opportunity._id}`}
-          className="flex-1 flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
-        >
-          View Details
-        </Link>
-      </div>
+      <Link
+        to={`/opportunities/${opportunity._id}`}
+        className="block w-full text-center px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
+      >
+        View Details
+      </Link>
     </div>
   );
 };

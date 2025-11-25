@@ -29,8 +29,7 @@ const Signup = () => {
     const success = await signup(formData);
     setIsLoading(false);
     if (success) {
-      // Redirect to a verification page or login page
-      navigate('/login'); 
+      navigate('/verify-email', { state: { email: formData.email } }); 
     }
   };
 

@@ -3,7 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { Users, Briefcase, Clock, AlertCircle, TrendingUp, BarChart2, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { getUserAvatarUrl } from '../../utils/avatar';
 import Loader from '../../components/Loader';
+import logo from '../../assets/logo.png';
 
 const AdminDashboard = () => {
   const { logout, user } = useAuth();
@@ -23,11 +25,10 @@ const AdminDashboard = () => {
   const fetchStats = async () => {
     try {
       const response = await api.get('/admin/dashboard');
-      // Assuming the API returns these fields, or we map them
       setStats({
-        totalUsers: response.data.data.stats.totalUsers || 0,
-        activeOpportunities: response.data.data.stats.totalOpportunities || 0,
-        pendingApprovals: 78, // Mock data as API might not have this
+        totalUsers: response.data.data.totalActiveUsers || 0,
+        activeOpportunities: response.data.data.totalOpportunities || 0,
+        pendingApprovals: 78, // Mock data
         flaggedReports: 12    // Mock data
       });
     } catch (error) {
@@ -45,14 +46,12 @@ const AdminDashboard = () => {
   if (loading) return <Loader />;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="flex bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col fixed h-full">
+      <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col min-h-full">
         <div className="p-6 border-b border-gray-200">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-              <div className="w-4 h-4 border-2 border-white rounded-full"></div>
-            </div>
+            <img src={logo} alt="SkillMatch Logo" className="w-8 h-8 rounded-lg" />
             <span className="text-xl font-bold text-primary-600">SkillMatch</span>
           </Link>
         </div>
@@ -76,15 +75,15 @@ const AdminDashboard = () => {
           </Link>
         </nav>
 
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-200 mt-auto">
           <div className="flex items-center gap-3 mb-4 px-4">
             <img 
-              src={user?.photo || `https://ui-avatars.com/api/?name=${user?.name}&background=random`} 
+              src={getUserAvatarUrl(user)} 
               alt="Admin" 
-              className="w-10 h-10 rounded-full"
+              className="w-10 h-10 rounded-full object-cover"
             />
             <div>
-              <p className="text-sm font-bold text-gray-900">{user?.name}</p>
+              <p className="text-sm font-bold text-gray-900">{user?.username}</p>
               <p className="text-xs text-gray-500">Admin User</p>
             </div>
           </div>
@@ -99,7 +98,7 @@ const AdminDashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 md:ml-64 p-8">
+      <main className="flex-1 p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard Overview</h1>
           <p className="text-gray-500 mt-1">Key metrics and insights for SkillMatch platform activity.</p>
@@ -146,12 +145,11 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Charts Section - Placeholder for visual representation */}
+        {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
             <h3 className="text-lg font-bold text-gray-900 mb-6">User Growth Over Time</h3>
             <div className="h-64 flex items-end justify-between gap-2 px-4">
-              {/* Simple CSS Bar Chart Simulation */}
               {[30, 45, 55, 60, 75, 85, 95].map((h, i) => (
                 <div key={i} className="w-full bg-primary-100 rounded-t-lg relative group">
                   <div 
@@ -169,7 +167,6 @@ const AdminDashboard = () => {
           <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
             <h3 className="text-lg font-bold text-gray-900 mb-6">Opportunity Engagement</h3>
             <div className="h-64 flex items-end justify-between gap-4 px-4">
-               {/* Simple CSS Bar Chart Simulation */}
                {[60, 80, 45, 55, 30].map((h, i) => (
                 <div key={i} className="w-full flex flex-col justify-end gap-1">
                   <div className="w-full bg-yellow-400 rounded-t-sm" style={{ height: `${h}%` }}></div>

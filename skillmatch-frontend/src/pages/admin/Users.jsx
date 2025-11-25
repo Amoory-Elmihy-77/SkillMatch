@@ -5,6 +5,8 @@ import { Users, Trash2, Search, MoreVertical, LayoutDashboard, Briefcase, BarCha
 import Loader from '../../components/Loader';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
+import { getUserAvatarUrl } from '../../utils/avatar';
+import logo from '../../assets/logo.png';
 
 const AdminUsers = () => {
   const { logout, user: currentUser } = useAuth();
@@ -41,21 +43,19 @@ const AdminUsers = () => {
   };
 
   const filteredUsers = users.filter(user => 
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) return <Loader />;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar (Reused - ideally should be a component) */}
-      <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col fixed h-full">
+    <div className="flex bg-gray-50">
+      {/* Sidebar */}
+      <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col min-h-full">
         <div className="p-6 border-b border-gray-200">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-              <div className="w-4 h-4 border-2 border-white rounded-full"></div>
-            </div>
+            <img src={logo} alt="SkillMatch Logo" className="w-8 h-8 rounded-lg" />
             <span className="text-xl font-bold text-primary-600">SkillMatch</span>
           </Link>
         </div>
@@ -79,15 +79,15 @@ const AdminUsers = () => {
           </Link>
         </nav>
 
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-200 mt-auto">
           <div className="flex items-center gap-3 mb-4 px-4">
             <img 
-              src={currentUser?.photo || `https://ui-avatars.com/api/?name=${currentUser?.name}&background=random`} 
+              src={getUserAvatarUrl(currentUser)} 
               alt="Admin" 
-              className="w-10 h-10 rounded-full"
+              className="w-10 h-10 rounded-full object-cover"
             />
             <div>
-              <p className="text-sm font-bold text-gray-900">{currentUser?.name}</p>
+              <p className="text-sm font-bold text-gray-900">{currentUser?.username}</p>
               <p className="text-xs text-gray-500">Admin User</p>
             </div>
           </div>
@@ -149,10 +149,10 @@ const AdminUsers = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
-                        <img className="h-10 w-10 rounded-full" src={user.photo || `https://ui-avatars.com/api/?name=${user.name}&background=random`} alt="" />
+                        <img className="h-10 w-10 rounded-full object-cover" src={getUserAvatarUrl(user)} alt="" />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                        <div className="text-sm font-medium text-gray-900">{user.username}</div>
                         <div className="text-sm text-gray-500">{user.email}</div>
                       </div>
                     </div>
