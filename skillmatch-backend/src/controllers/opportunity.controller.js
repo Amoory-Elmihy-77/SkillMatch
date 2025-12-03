@@ -226,46 +226,100 @@ exports.getRecommendedOpportunities = async (req, res) => {
 };
 
 // Save or unsave an opportunity
-exports.saveOpportunity = async (req, res) => {
-  try {
-    const opportunityId = req.params.id;
+// exports.saveOpportunity = async (req, res) => {
+//   try {
+//     const opportunityId = req.params.id;
 
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
+//     const user = await User.findByIdAndUpdate(
+//       req.user.id,
+//       { $addToSet: { savedOpportunities: opportunityId } },
+//       { new: true }
+//     );
+
+//     res.status(200).json({
+//       status: "success",
+//       message: "Opportunity saved successfully.",
+//       data: {
+//         savedCount: user.savedOpportunities.length,
+//       },
+//     });
+//   } catch (err) {
+//     res.status(400).json({ status: "fail", message: err.message });
+//   }
+// };
+
+// exports.unsaveOpportunity = async (req, res) => {
+//   try {
+//     const opportunityId = req.params.id;
+
+//     const user = await User.findByIdAndUpdate(
+//       req.user.id,
+//       { $pull: { savedOpportunities: opportunityId } },
+//       { new: true }
+//     );
+
+//     res.status(200).json({
+//       status: "success",
+//       message: "Opportunity unsaved successfully.",
+//       data: {
+//         savedCount: user.savedOpportunities.length,
+//       },
+//     });
+//   } catch (err) {
+//     res.status(400).json({ status: "fail", message: err.message });
+//   }
+// };
+
+exports.saveOpportunity = async (req, res, next) => {
+  const currentUserId = req.user.id;
+  const opportunityId = req.params.id;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      currentUserId,
       { $addToSet: { savedOpportunities: opportunityId } },
       { new: true }
-    );
+    ).select("savedOpportunities");
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found." });
+    }
 
     res.status(200).json({
       status: "success",
       message: "Opportunity saved successfully.",
       data: {
-        savedCount: user.savedOpportunities.length,
+        savedOpportunities: updatedUser.savedOpportunities,
       },
     });
-  } catch (err) {
-    res.status(400).json({ status: "fail", message: err.message });
+  } catch (error) {
+    next(error);
   }
 };
 
-exports.unsaveOpportunity = async (req, res) => {
-  try {
-    const opportunityId = req.params.id;
+exports.unsaveOpportunity = async (req, res, next) => {
+  const currentUserId = req.user.id;
+  const opportunityId = req.params.id;
 
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      currentUserId,
       { $pull: { savedOpportunities: opportunityId } },
       { new: true }
-    );
+    ).select("savedOpportunities");
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found." });
+    }
 
     res.status(200).json({
       status: "success",
       message: "Opportunity unsaved successfully.",
       data: {
-        savedCount: user.savedOpportunities.length,
+        savedOpportunities: updatedUser.savedOpportunities,
       },
     });
-  } catch (err) {
-    res.status(400).json({ status: "fail", message: err.message });
+  } catch (error) {
+    next(error);
   }
 };

@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { MapPin, Briefcase, Mail, Calendar, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { getUserAvatarUrl } from '../utils/avatar';
-import ConnectionButton from '../components/ConnectionButton';
-import api from '../services/api';
-import Loader from '../components/Loader';
-import toast from 'react-hot-toast';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { MapPin, Briefcase, Mail, Calendar, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { getUserAvatarUrl } from "../utils/avatar";
+import ConnectionButton from "../components/ConnectionButton";
+import api from "../services/api";
+import Loader from "../components/Loader";
+import toast from "react-hot-toast";
 
 const UserProfile = () => {
   const { userId } = useParams();
@@ -28,8 +28,8 @@ const UserProfile = () => {
       const response = await api.get(`/auth/${userId}`);
       setProfileUser(response.data.data?.user || response.data.user);
     } catch (error) {
-      console.error('Failed to fetch user profile:', error);
-      toast.error('Failed to load user profile');
+      console.error("Failed to fetch user profile:", error);
+      toast.error("Failed to load user profile");
     } finally {
       setLoading(false);
     }
@@ -47,8 +47,12 @@ const UserProfile = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">User not found</h2>
-          <p className="text-gray-600 mb-4">The user you're looking for doesn't exist</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            User not found
+          </h2>
+          <p className="text-gray-600 mb-4">
+            The user you're looking for doesn't exist
+          </p>
           <Link
             to="/discover"
             className="text-primary-600 hover:text-primary-700 font-medium"
@@ -95,16 +99,18 @@ const UserProfile = () => {
                 </div>
               </div>
 
-              {!isOwnProfile && (
-                <ConnectionButton userId={userId} />
-              )}
+              {!isOwnProfile && <ConnectionButton userId={userId} />}
             </div>
 
             <div className="mb-6">
-              <h1 className="text-2xl font-bold text-gray-900">{profileUser.name}</h1>
+              <h1 className="text-2xl font-bold text-gray-900">
+                {profileUser.name}
+              </h1>
               <p className="text-gray-600">@{profileUser.username}</p>
               {profileUser.title && (
-                <p className="text-lg text-gray-700 mt-1">{profileUser.title}</p>
+                <p className="text-lg text-gray-700 mt-1">
+                  {profileUser.title}
+                </p>
               )}
             </div>
 
@@ -130,14 +136,19 @@ const UserProfile = () => {
               {profileUser.createdAt && (
                 <div className="flex items-center gap-2 text-gray-600">
                   <Calendar className="w-5 h-5" />
-                  <span>Joined {new Date(profileUser.createdAt).toLocaleDateString()}</span>
+                  <span>
+                    Joined{" "}
+                    {new Date(profileUser.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
               )}
             </div>
 
             {profileUser.skills && profileUser.skills.length > 0 && (
               <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-3">Skills</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                  Skills
+                </h2>
                 <div className="flex flex-wrap gap-2">
                   {profileUser.skills.map((skill, index) => (
                     <span
@@ -153,7 +164,9 @@ const UserProfile = () => {
 
             {profileUser.interests && profileUser.interests.length > 0 && (
               <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-3">Interests</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                  Interests
+                </h2>
                 <div className="flex flex-wrap gap-2">
                   {profileUser.interests.map((interest, index) => (
                     <span

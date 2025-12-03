@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Users, Search, MapPin, Briefcase } from 'lucide-react';
-import api from '../services/api';
-import { getUserAvatarUrl } from '../utils/avatar';
-import Loader from '../components/Loader';
-import toast from 'react-hot-toast';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Users, Search, MapPin, Briefcase } from "lucide-react";
+import api from "../services/api";
+import { getUserAvatarUrl } from "../utils/avatar";
+import Loader from "../components/Loader";
+import toast from "react-hot-toast";
 
 const DiscoverUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchUsers();
@@ -18,20 +18,21 @@ const DiscoverUsers = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/auth/discover');
+      const response = await api.get("/auth/discover");
       setUsers(response.data.users || response.data.data?.users || []);
     } catch (error) {
-      console.error('Failed to fetch users:', error);
-      toast.error('Failed to load users');
+      console.error("Failed to fetch users:", error);
+      toast.error("Failed to load users");
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredUsers = users.filter(user =>
-    user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.title?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.title?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -42,7 +43,9 @@ const DiscoverUsers = () => {
             <Users className="w-8 h-8 text-primary-600" />
             Discover Users
           </h1>
-          <p className="text-gray-600 mt-2">Connect with professionals in your field</p>
+          <p className="text-gray-600 mt-2">
+            Connect with professionals in your field
+          </p>
         </div>
 
         <div className="mb-6">
@@ -66,16 +69,16 @@ const DiscoverUsers = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
             <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {searchQuery ? 'No users found' : 'No users to suggest'}
+              {searchQuery ? "No users found" : "No users to suggest"}
             </h3>
             <p className="text-gray-500">
               {searchQuery
-                ? 'Try adjusting your search criteria'
-                : 'Check back later for new users to connect with'}
+                ? "Try adjusting your search criteria"
+                : "Check back later for new users to connect with"}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid  grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredUsers.map((user) => (
               <div
                 key={user._id}
@@ -92,15 +95,17 @@ const DiscoverUsers = () => {
                     <h3 className="text-xl font-bold text-gray-900 mb-1">
                       {user.name}
                     </h3>
-                    <p className="text-sm text-gray-500 mb-3">@{user.username}</p>
-                    
+                    <p className="text-sm text-gray-500 mb-3">
+                      @{user.username}
+                    </p>
+
                     {user.title && (
                       <div className="flex items-center gap-1 text-sm text-gray-600 mb-2">
                         <Briefcase className="w-4 h-4" />
                         <span>{user.title}</span>
                       </div>
                     )}
-                    
+
                     {user.location && (
                       <div className="flex items-center gap-1 text-sm text-gray-600 mb-4">
                         <MapPin className="w-4 h-4" />
@@ -147,7 +152,8 @@ const DiscoverUsers = () => {
 
         {!loading && filteredUsers.length > 0 && (
           <div className="mt-6 text-center text-sm text-gray-500">
-            Showing {filteredUsers.length} {filteredUsers.length === 1 ? 'user' : 'users'}
+            Showing {filteredUsers.length}{" "}
+            {filteredUsers.length === 1 ? "user" : "users"}
           </div>
         )}
       </div>

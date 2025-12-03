@@ -20,9 +20,22 @@ const OpportunityDetails = () => {
 
   useEffect(() => {
     if (user && opportunity) {
-      setIsSaved(user.savedOpportunities?.includes(opportunity._id));
+      checkIfSaved();
     }
   }, [user, opportunity]);
+
+  const checkIfSaved = async () => {
+    try {
+      const response = await api.get('/auth/me/saved');
+      const savedOpps = response.data.data?.savedOpportunities || [];
+      const isCurrentlySaved = savedOpps.some(opp => opp._id === opportunity._id);
+      setIsSaved(isCurrentlySaved);
+    } catch (error) {
+      console.error('Failed to check saved status:', error);
+      // Fallback to user object if available
+      setIsSaved(user?.savedOpportunities?.includes(opportunity._id) || false);
+    }
+  };
 
   const fetchOpportunity = async () => {
     setLoading(true);
@@ -64,7 +77,7 @@ const OpportunityDetails = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
         >
@@ -77,22 +90,20 @@ const OpportunityDetails = () => {
           <div className="p-8 border-b border-gray-100">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-4 ${
-                  opportunity.type === 'job' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700'
-                }`}>
+                <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-4 ${opportunity.type === 'job' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700'
+                  }`}>
                   {opportunity.type === 'job' ? 'Job Opportunity' : 'Learning Resource'}
                 </div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">{opportunity.title}</h1>
                 <p className="text-xl text-gray-600">{opportunity.company || 'Unknown Provider'}</p>
               </div>
               <div className="flex gap-3">
-                <button 
+                <button
                   onClick={handleSave}
-                  className={`p-3 rounded-lg border transition-colors ${
-                    isSaved 
-                      ? 'bg-primary-50 border-primary-200 text-primary-600' 
+                  className={`p-3 rounded-lg border transition-colors ${isSaved
+                      ? 'bg-primary-50 border-primary-200 text-primary-600'
                       : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
-                  }`}
+                    }`}
                 >
                   <Bookmark className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`} />
                 </button>
@@ -151,8 +162,8 @@ const OpportunityDetails = () => {
                 <p className="text-sm text-gray-600 mb-6">
                   Interested in this opportunity? Click below to apply directly on the provider's website.
                 </p>
-                <a 
-                  href="#" 
+                <a
+                  href="#"
                   className="block w-full py-3 px-4 bg-primary-600 text-white text-center rounded-lg font-medium hover:bg-primary-700 transition-colors"
                 >
                   Apply Now

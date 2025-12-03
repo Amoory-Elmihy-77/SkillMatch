@@ -1,17 +1,27 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Search, Bell, Menu, X, LogOut, User, Heart, Users } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { getUserAvatarUrl } from '../utils/avatar';
-import NotificationsPanel from './NotificationsPanel';
-import logo from '../assets/logo.png';
+import React, { useState, useRef, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Search,
+  Bell,
+  Menu,
+  X,
+  LogOut,
+  User,
+  Heart,
+  Users,
+  Sparkles,
+} from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { getUserAvatarUrl } from "../utils/avatar";
+import NotificationsPanel from "./NotificationsPanel";
+import logo from "../assets/logo.png";
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const profileRef = useRef(null);
 
   useEffect(() => {
@@ -21,9 +31,9 @@ const Navbar = () => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -33,7 +43,7 @@ const Navbar = () => {
     if (query) {
       navigate(`/opportunities?search=${encodeURIComponent(query)}`);
     } else {
-      navigate('/opportunities');
+      navigate("/opportunities");
     }
   };
 
@@ -44,27 +54,33 @@ const Navbar = () => {
           {/* Logo and Left Section */}
           <div className="flex items-center gap-6">
             <Link to="/" className="flex-shrink-0 flex items-center gap-2">
-              <img src={logo} alt="SkillMatch Logo" className="w-8 h-8 rounded-lg" />
-              <span className="text-xl font-bold text-primary-600">SkillMatch</span>
+              <img
+                src={logo}
+                alt="SkillMatch Logo"
+                className="w-8 h-8 rounded-lg"
+              />
+              <span className="text-xl font-bold text-primary-600">
+                SkillMatch
+              </span>
             </Link>
 
             {/* Admin Navigation - Only visible for admin users */}
-            {user?.role === 'admin' && (
+            {user?.role === "admin" && (
               <div className="hidden lg:flex items-center gap-1 ml-4 pl-4 border-l border-gray-200">
-                <Link 
-                  to="/admin/dashboard" 
+                <Link
+                  to="/admin/dashboard"
                   className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
                 >
                   Dashboard
                 </Link>
-                <Link 
-                  to="/admin/users" 
+                <Link
+                  to="/admin/users"
                   className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
                 >
                   Users
                 </Link>
-                <Link 
-                  to="/admin/opportunities" 
+                <Link
+                  to="/admin/opportunities"
                   className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
                 >
                   Opportunities
@@ -76,7 +92,10 @@ const Navbar = () => {
           {/* Center Search Bar - Only for authenticated users */}
           {isAuthenticated && (
             <div className="hidden md:flex flex-1 items-center justify-center px-8">
-              <form onSubmit={handleSearch} className="w-full max-w-lg relative">
+              <form
+                onSubmit={handleSearch}
+                className="w-full max-w-lg relative"
+              >
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search className="h-5 w-5 text-gray-400" />
                 </div>
@@ -95,15 +114,30 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-4">
             {isAuthenticated ? (
               <>
-                <Link to="/discover" className="p-2 text-gray-400 hover:text-primary-600 transition-colors" title="Discover Users">
+                <Link
+                  to="/discover"
+                  className="p-2 text-gray-400 hover:text-primary-600 transition-colors"
+                  title="Discover Users"
+                >
                   <Users className="h-6 w-6" />
                 </Link>
-                <Link to="/me/saved" className="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Saved Opportunities">
+                <Link
+                  to="/recommended"
+                  className="p-2 text-gray-400 hover:text-purple-600 transition-colors"
+                  title="Personalized Recommendations"
+                >
+                  <Sparkles className="h-6 w-6" />
+                </Link>
+                <Link
+                  to="/me/saved"
+                  className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                  title="Saved Opportunities"
+                >
                   <Heart className="h-6 w-6" />
                 </Link>
                 <NotificationsPanel />
                 <div className="relative" ref={profileRef}>
-                  <button 
+                  <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                     className="flex items-center gap-2 focus:outline-none"
                   >
@@ -117,26 +151,30 @@ const Navbar = () => {
                   {isProfileOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-50">
                       <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
-                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {user?.name}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {user?.email}
+                        </p>
                       </div>
-                      <Link 
-                        to="/me" 
+                      <Link
+                        to="/me"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={() => setIsProfileOpen(false)}
                       >
                         Your Profile
                       </Link>
-                      <Link 
-                        to="/me/saved" 
+                      <Link
+                        to="/me/saved"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={() => setIsProfileOpen(false)}
                       >
                         Personalized Opportunities
                       </Link>
-                      {user?.role === 'admin' && (
-                        <Link 
-                          to="/admin/dashboard" 
+                      {user?.role === "admin" && (
+                        <Link
+                          to="/admin/dashboard"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsProfileOpen(false)}
                         >
@@ -158,7 +196,10 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Link to="/login" className="text-gray-500 hover:text-gray-900 font-medium">
+                <Link
+                  to="/login"
+                  className="text-gray-500 hover:text-gray-900 font-medium"
+                >
                   Log In
                 </Link>
                 <Link
@@ -207,17 +248,38 @@ const Navbar = () => {
                 </div>
               </form>
             )}
-            
+
             {isAuthenticated ? (
               <>
-                <Link to="/me" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                <Link
+                  to="/me"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                >
                   Profile
                 </Link>
-                <Link to="/me/saved" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                  Saved Items
+                <Link
+                  to="/me/saved"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                >
+                  Personalized Recommendations
                 </Link>
-                {user?.role === 'admin' && (
-                  <Link to="/admin/dashboard" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                <Link
+                  to="/discover"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                >
+                  Discover Users
+                </Link>
+                <Link
+                  to="/me/saved"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                >
+                  Saved Opportunities
+                </Link>
+                {user?.role === "admin" && (
+                  <Link
+                    to="/admin/dashboard"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                  >
                     Admin Dashboard
                   </Link>
                 )}
@@ -230,10 +292,16 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Link to="/login" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                <Link
+                  to="/login"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                >
                   Log In
                 </Link>
-                <Link to="/signup" className="block px-3 py-2 rounded-md text-base font-medium text-primary-600 hover:text-primary-700 hover:bg-gray-50">
+                <Link
+                  to="/signup"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-primary-600 hover:text-primary-700 hover:bg-gray-50"
+                >
                   Join Now
                 </Link>
               </>
