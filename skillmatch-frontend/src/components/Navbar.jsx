@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Bell, Menu, X, LogOut, User, Heart } from 'lucide-react';
+import { Search, Bell, Menu, X, LogOut, User, Heart, Users } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { getUserAvatarUrl } from '../utils/avatar';
+import NotificationsPanel from './NotificationsPanel';
 import logo from '../assets/logo.png';
 
 const Navbar = () => {
@@ -70,10 +71,6 @@ const Navbar = () => {
                 </Link>
               </div>
             )}
-            {/* Debug: Check user role */}
-            {console.log('Current user:', user)}
-            {console.log('User role:', user?.role)}
-            {console.log('Is admin?', user?.role === 'admin')}
           </div>
 
           {/* Center Search Bar - Only for authenticated users */}
@@ -98,12 +95,13 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-4">
             {isAuthenticated ? (
               <>
+                <Link to="/discover" className="p-2 text-gray-400 hover:text-primary-600 transition-colors" title="Discover Users">
+                  <Users className="h-6 w-6" />
+                </Link>
                 <Link to="/me/saved" className="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Saved Opportunities">
                   <Heart className="h-6 w-6" />
                 </Link>
-                <button className="p-2 text-gray-400 hover:text-gray-500">
-                  <Bell className="h-6 w-6" />
-                </button>
+                <NotificationsPanel />
                 <div className="relative" ref={profileRef}>
                   <button 
                     onClick={() => setIsProfileOpen(!isProfileOpen)}

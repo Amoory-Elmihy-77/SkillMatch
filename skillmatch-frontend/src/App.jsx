@@ -9,20 +9,27 @@ import VerifyEmail from './pages/VerifyEmail';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Profile from './pages/Profile';
+import UserProfile from './pages/UserProfile';
+import DiscoverUsers from './pages/DiscoverUsers';
 import Opportunities from './pages/Opportunities';
 import Recommended from './pages/Recommended';
 import OpportunityDetails from './pages/OpportunityDetails';
+import Connections from './pages/Connections';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminUsers from './pages/admin/Users';
 import AdminOpportunities from './pages/admin/Opportunities';
 import ProtectedRoute from './components/ProtectedRoute';
+import { SocketProvider } from './contexts/SocketContext';
+import { NotificationsProvider } from './contexts/NotificationsContext';
 
 function App() {
   return (
     <Router>
-      <div className="flex flex-col min-h-screen">
-        <Navbar />
-        <main className="flex-grow">
+      <SocketProvider>
+        <NotificationsProvider>
+          <div className="flex flex-col min-h-screen">
+            <Navbar />
+            <main className="flex-grow">
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
@@ -49,6 +56,30 @@ function App() {
                 <ProtectedRoute>
                   {/* Reusing Recommended for now, or create a specific Saved page */}
                   <Recommended /> 
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/connections" 
+              element={
+                <ProtectedRoute>
+                  <Connections />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/discover" 
+              element={
+                <ProtectedRoute>
+                  <DiscoverUsers />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile/:userId" 
+              element={
+                <ProtectedRoute>
+                  <UserProfile />
                 </ProtectedRoute>
               } 
             />
@@ -93,6 +124,8 @@ function App() {
         </main>
         <Footer />
       </div>
+        </NotificationsProvider>
+      </SocketProvider>
     </Router>
   );
 }

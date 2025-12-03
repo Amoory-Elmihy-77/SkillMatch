@@ -191,3 +191,42 @@ exports.updateProfilePhoto = async (req, res) => {
     res.status(500).json({ status: "error", message: err.message });
   }
 };
+
+// 8. Get Suggested Users to Connect With
+exports.getSuggestedUsers = async (req, res, next) => {
+  const currentUserId = req.user.id;
+
+  try {
+    const users = await User.find({
+      _id: { $ne: currentUserId },
+    })
+      .select("email username title photo")
+      .limit(10);
+
+    res.status(200).json({ users });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// 9. Get Any User Profile By ID
+exports.getUserProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id).select(
+      "-password -__v -passwordChangedAt -passwordResetExpires -passwordResetCode"
+    );
+
+    if (!user) {
+      return next(
+        new ErrorResponse(`User not found with id of ${req.params.id}`, 404)
+      );
+    }
+
+    res.status(200).json({
+      status: "success",
+      user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

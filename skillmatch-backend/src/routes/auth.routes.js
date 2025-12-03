@@ -26,6 +26,8 @@ router.use(authMiddleware.protect);
 router.get("/me", userController.getMe);
 router.patch("/updateMe", userController.updateMe);
 router.patch("/updateMyPassword", userController.updateMyPassword);
+router.get("/discover", userController.getSuggestedUsers);
+router.get("/:id", userController.getUserProfile);
 
 router.patch(
   "/updateMyPhoto",
