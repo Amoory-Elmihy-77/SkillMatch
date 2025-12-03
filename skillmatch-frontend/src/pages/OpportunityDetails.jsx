@@ -71,6 +71,32 @@ const OpportunityDetails = () => {
     }
   };
 
+  const handleShare = async () => {
+    const shareUrl = window.location.href;
+    const shareData = {
+      title: opportunity.title,
+      text: `Check out this opportunity: ${opportunity.title}`,
+      url: shareUrl,
+    };
+
+    try {
+      // Use Web Share API if available (mobile devices)
+      if (navigator.share) {
+        await navigator.share(shareData);
+        toast.success('Shared successfully!');
+      } else {
+        // Fallback: Copy to clipboard
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success('Link copied to clipboard!');
+      }
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        console.error('Failed to share:', error);
+        toast.error('Failed to share');
+      }
+    }
+  };
+
   if (loading) return <Loader />;
   if (!opportunity) return null;
 
@@ -101,13 +127,16 @@ const OpportunityDetails = () => {
                 <button
                   onClick={handleSave}
                   className={`p-3 rounded-lg border transition-colors ${isSaved
-                      ? 'bg-primary-50 border-primary-200 text-primary-600'
-                      : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
+                    ? 'bg-primary-50 border-primary-200 text-primary-600'
+                    : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
                     }`}
                 >
                   <Bookmark className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`} />
                 </button>
-                <button className="p-3 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 bg-white">
+                <button
+                  onClick={handleShare}
+                  className="p-3 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 bg-white"
+                >
                   <Share2 className="w-5 h-5" />
                 </button>
               </div>
