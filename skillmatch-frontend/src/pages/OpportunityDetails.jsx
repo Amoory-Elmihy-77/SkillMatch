@@ -5,6 +5,7 @@ import Loader from '../components/Loader';
 import { MapPin, Clock, DollarSign, Globe, Share2, Bookmark, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
+import ApplicationButton from '../components/ApplicationButton';
 
 const OpportunityDetails = () => {
   const { id } = useParams();
@@ -187,16 +188,11 @@ const OpportunityDetails = () => {
             {/* Sidebar */}
             <div className="space-y-6">
               <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="font-bold text-gray-900 mb-4">Apply Now</h3>
+                <h3 className="font-bold text-gray-900 mb-4">Apply to this Opportunity</h3>
                 <p className="text-sm text-gray-600 mb-6">
-                  Interested in this opportunity? Click below to apply directly on the provider's website.
+                  Submit your application and track its status here.
                 </p>
-                <a
-                  href="#"
-                  className="block w-full py-3 px-4 bg-primary-600 text-white text-center rounded-lg font-medium hover:bg-primary-700 transition-colors"
-                >
-                  Apply Now
-                </a>
+                <ApplicationButton opportunityId={opportunity._id} />
               </div>
 
               <div className="bg-gray-50 p-6 rounded-xl">

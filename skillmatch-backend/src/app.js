@@ -13,6 +13,8 @@ const opportunityRoutes = require("./routes/opportunity.routes");
 const adminRoutes = require("./routes/admin.routes");
 const connectionRoutes = require("./routes/connection.routes");
 const notificationRoutes = require("./routes/notification.routes");
+const applicationRoutes = require("./routes/application.routes");
+const managerRoutes = require("./routes/manager.routes");
 const { notFound, errorHandler } = require("./middlewares/error.middleware");
 const { limiter } = require("./middlewares/globalLimiting.middleware");
 
@@ -77,6 +79,8 @@ app.use("/api/opportunities", opportunityRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/connections", connectionRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/applications", applicationRoutes);
+app.use("/api/manager", managerRoutes);
 
 app.get("/", (req, res) => {
   res.send("SkillMatch Backend API is running!");

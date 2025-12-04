@@ -29,7 +29,7 @@ const createSendToken = (user, statusCode, res) => {
 // SignUp
 exports.signup = async (req, res) => {
   try {
-    const { username, email, password, passwordConfirm, skills } = req.body;
+    const { username, email, password, passwordConfirm, skills, role } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -44,6 +44,13 @@ exports.signup = async (req, res) => {
         .json({ status: "fail", message: "Passwords do not match." });
     }
 
+    if (role && !["user", "manager"].includes(role)) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Invalid role. You can only sign up as 'user' or 'manager'.",
+      });
+    }
+
     const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     const newUser = await User.create({
@@ -51,6 +58,7 @@ exports.signup = async (req, res) => {
       email,
       password,
       skills,
+      role: role || "user",
       verificationCode: verifyCode,
       verificationCodeExpires: Date.now() + 10 * 60 * 1000,
     });

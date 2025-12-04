@@ -63,35 +63,11 @@ const Navbar = () => {
                 SkillMatch
               </span>
             </Link>
-
-            {/* Admin Navigation - Only visible for admin users */}
-            {user?.role === "admin" && (
-              <div className="hidden lg:flex items-center gap-1 ml-4 pl-4 border-l border-gray-200">
-                <Link
-                  to="/admin/dashboard"
-                  className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  to="/admin/users"
-                  className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
-                >
-                  Users
-                </Link>
-                <Link
-                  to="/admin/opportunities"
-                  className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
-                >
-                  Opportunities
-                </Link>
-              </div>
-            )}
           </div>
 
           {/* Center Search Bar - Only for authenticated users */}
           {isAuthenticated && (
-            <div className="hidden md:flex flex-1 items-center justify-center px-8">
+            <div className="hidden md:flex flex-1 items-center justify-center px-4 md:px-8">
               <form
                 onSubmit={handleSearch}
                 className="w-full max-w-lg relative"
@@ -164,6 +140,84 @@ const Navbar = () => {
                         onClick={() => setIsProfileOpen(false)}
                       >
                         Your Profile
+                      </Link>
+
+                      {/* Manager Links */}
+                      {(user?.role === "manager" || user?.role === "admin") && (
+                        <>
+                          <div className="border-t border-gray-100 my-1"></div>
+                          <div className="px-4 py-2">
+                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Manager</p>
+                          </div>
+                          <Link
+                            to="/manager/dashboard"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsProfileOpen(false)}
+                          >
+                            Dashboard
+                          </Link>
+                          <Link
+                            to="/manager/opportunities"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsProfileOpen(false)}
+                          >
+                            My Opportunities
+                          </Link>
+                          <Link
+                            to="/manager/applications"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsProfileOpen(false)}
+                          >
+                            Applications
+                          </Link>
+                        </>
+                      )}
+
+                      {/* Admin Links */}
+                      {user?.role === "admin" && (
+                        <>
+                          <div className="border-t border-gray-100 my-1"></div>
+                          <div className="px-4 py-2">
+                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Admin</p>
+                          </div>
+                          <Link
+                            to="/admin/dashboard"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsProfileOpen(false)}
+                          >
+                            Admin Dashboard
+                          </Link>
+                          <Link
+                            to="/admin/users"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsProfileOpen(false)}
+                          >
+                            Users
+                          </Link>
+                          <Link
+                            to="/admin/opportunities"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsProfileOpen(false)}
+                          >
+                            Opportunities
+                          </Link>
+                          <Link
+                            to="/admin/applications"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsProfileOpen(false)}
+                          >
+                            All Applications
+                          </Link>
+                        </>
+                      )}
+
+                      <div className="border-t border-gray-100 my-1"></div>
+                      <Link
+                        to="/my-applications"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        My Applications
                       </Link>
                       <Link
                         to="/me/saved"

@@ -16,9 +16,14 @@ import Recommended from './pages/Recommended';
 import SavedOpportunities from './pages/SavedOpportunities';
 import OpportunityDetails from './pages/OpportunityDetails';
 import Connections from './pages/Connections';
+import MyApplications from './pages/MyApplications';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminUsers from './pages/admin/Users';
 import AdminOpportunities from './pages/admin/Opportunities';
+import AdminApplications from './pages/admin/Applications';
+import ManagerDashboard from './pages/manager/Dashboard';
+import ManagerOpportunities from './pages/manager/Opportunities';
+import ManagerApplications from './pages/manager/Applications';
 import ProtectedRoute from './components/ProtectedRoute';
 import { SocketProvider } from './contexts/SocketContext';
 import { NotificationsProvider } from './contexts/NotificationsContext';
@@ -91,6 +96,40 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/my-applications"
+                  element={
+                    <ProtectedRoute>
+                      <MyApplications />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Manager Routes */}
+                <Route
+                  path="/manager/dashboard"
+                  element={
+                    <ProtectedRoute managerOnly>
+                      <ManagerDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/manager/opportunities"
+                  element={
+                    <ProtectedRoute managerOnly>
+                      <ManagerOpportunities />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/manager/applications"
+                  element={
+                    <ProtectedRoute managerOnly>
+                      <ManagerApplications />
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* Admin Routes */}
                 <Route
@@ -114,6 +153,14 @@ function App() {
                   element={
                     <ProtectedRoute adminOnly>
                       <AdminOpportunities />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/applications"
+                  element={
+                    <ProtectedRoute adminOnly>
+                      <AdminApplications />
                     </ProtectedRoute>
                   }
                 />

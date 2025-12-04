@@ -19,7 +19,11 @@ router.use(authMiddleware.protect);
 router.post("/save/:id", opportunityController.saveOpportunity);
 router.delete("/unsave/:id", opportunityController.unsaveOpportunity);
 
-router.use(authMiddleware.authorize("admin"));
+// Apply to opportunity (any authenticated user)
+router.post("/apply/:id", opportunityController.applyToOpportunity);
+
+// Admin and Manager only routes
+router.use(authMiddleware.authorize("admin", "manager"));
 
 router.route("/").post(opportunityController.createOpportunity);
 

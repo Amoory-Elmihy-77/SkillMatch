@@ -17,6 +17,8 @@ router
   .patch(adminController.updateUser)
   .delete(adminController.deleteUser);
 
+router.route("/applications").get(adminController.getAllApplications);
+
 router
   .route("/opportunities")
   .get(opportunityController.getOpportunities)

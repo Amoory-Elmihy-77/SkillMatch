@@ -35,7 +35,7 @@ const NotificationsPanel = () => {
   const handleAcceptConnection = async (notification) => {
     // Extract connection ID from notification object
     const connectionId = notification.referenceId || notification.connectionId || notification.relatedId;
-    
+
     if (!connectionId) {
       console.error('ERROR: Connection ID is missing in notification:', notification);
       toast.error('Cannot accept connection: Missing connection ID');
@@ -47,10 +47,10 @@ const NotificationsPanel = () => {
     try {
       await api.post(`/connections/${connectionId}/accept`);
       toast.success('Connection request accepted!');
-      
+
       // Mark notification as read on backend to prevent it from reappearing
       await markAsRead(notification._id);
-      
+
       // Remove notification from UI immediately
       removeNotification(notification._id);
     } catch (error) {
@@ -65,7 +65,7 @@ const NotificationsPanel = () => {
   const handleRejectConnection = async (notification) => {
     // Extract connection ID from notification object
     const connectionId = notification.referenceId || notification.connectionId || notification.relatedId;
-    
+
     if (!connectionId) {
       console.error('ERROR: Connection ID is missing in notification:', notification);
       toast.error('Cannot reject connection: Missing connection ID');
@@ -77,10 +77,10 @@ const NotificationsPanel = () => {
     try {
       await api.post(`/connections/${connectionId}/reject`);
       toast.success('Connection request rejected');
-      
+
       // Mark notification as read on backend to prevent it from reappearing
       await markAsRead(notification._id);
-      
+
       // Remove notification from UI immediately
       removeNotification(notification._id);
     } catch (error) {
@@ -107,6 +107,8 @@ const NotificationsPanel = () => {
         return <Check className="w-5 h-5 text-green-600" />;
       case 'job_share':
         return <Briefcase className="w-5 h-5 text-purple-600" />;
+      case 'job_application':
+        return <Briefcase className="w-5 h-5 text-blue-600" />;
       case 'message':
         return <MessageSquare className="w-5 h-5 text-orange-600" />;
       default:
@@ -193,6 +195,34 @@ const NotificationsPanel = () => {
           </div>
         );
 
+      case 'job_application':
+        return (
+          <div className="flex items-start gap-3">
+            {notification.sender?.photo && (
+              <img
+                src={getUserAvatarUrl(notification.sender)}
+                alt={notification.sender.name}
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            )}
+            <div>
+              <p className="text-sm text-gray-900">
+                {notification.message || (
+                  <>
+                    <span className="font-semibold">{notification.sender?.name || 'Someone'}</span>
+                    {' '}{notification.type === 'job_application' && notification.status ?
+                      `application status: ${notification.status}` :
+                      'sent you a job application notification'}
+                  </>
+                )}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                {new Date(notification.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+        );
+
       default:
         return (
           <div>
@@ -243,9 +273,8 @@ const NotificationsPanel = () => {
                   <div
                     key={notification._id}
                     onClick={() => handleNotificationClick(notification)}
-                    className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-                      !notification.isRead ? 'bg-blue-50' : ''
-                    }`}
+                    className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${!notification.isRead ? 'bg-blue-50' : ''
+                      }`}
                   >
                     <div className="flex items-start gap-3">
                       <div className="flex-shrink-0 mt-1">

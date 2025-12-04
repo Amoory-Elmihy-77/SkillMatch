@@ -1,5 +1,7 @@
 const User = require("../models/User.model");
 const Opportunity = require("../models/Opportunity.model");
+const Application = require("../models/Application.model");
+const Notification = require("../models/Notification.model");
 
 const getUniqueArray = (arr) =>
   [...new Set(arr.map((item) => item.toLowerCase().trim()))].filter(
@@ -225,51 +227,6 @@ exports.getRecommendedOpportunities = async (req, res) => {
   }
 };
 
-// Save or unsave an opportunity
-// exports.saveOpportunity = async (req, res) => {
-//   try {
-//     const opportunityId = req.params.id;
-
-//     const user = await User.findByIdAndUpdate(
-//       req.user.id,
-//       { $addToSet: { savedOpportunities: opportunityId } },
-//       { new: true }
-//     );
-
-//     res.status(200).json({
-//       status: "success",
-//       message: "Opportunity saved successfully.",
-//       data: {
-//         savedCount: user.savedOpportunities.length,
-//       },
-//     });
-//   } catch (err) {
-//     res.status(400).json({ status: "fail", message: err.message });
-//   }
-// };
-
-// exports.unsaveOpportunity = async (req, res) => {
-//   try {
-//     const opportunityId = req.params.id;
-
-//     const user = await User.findByIdAndUpdate(
-//       req.user.id,
-//       { $pull: { savedOpportunities: opportunityId } },
-//       { new: true }
-//     );
-
-//     res.status(200).json({
-//       status: "success",
-//       message: "Opportunity unsaved successfully.",
-//       data: {
-//         savedCount: user.savedOpportunities.length,
-//       },
-//     });
-//   } catch (err) {
-//     res.status(400).json({ status: "fail", message: err.message });
-//   }
-// };
-
 exports.saveOpportunity = async (req, res, next) => {
   const currentUserId = req.user.id;
   const opportunityId = req.params.id;
@@ -323,3 +280,83 @@ exports.unsaveOpportunity = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Apply to an opportunity
+ * @route POST /api/opportunities/apply/:id
+ * @access Protected (User)
+ */
+exports.applyToOpportunity = async (req, res, next) => {
+  try {
+    const opportunityId = req.params.id;
+    const applicantId = req.user.id;
+
+    // Check if opportunity exists
+    const opportunity = await Opportunity.findById(opportunityId).populate(
+      "createdBy",
+      "username email"
+    );
+
+    if (!opportunity) {
+      return res.status(404).json({
+        success: false,
+        message: "Opportunity not found",
+      });
+    }
+
+    // Check if user already applied
+    const existingApplication = await Application.findOne({
+      applicant: applicantId,
+      opportunity: opportunityId,
+    });
+
+    if (existingApplication) {
+      return res.status(400).json({
+        success: false,
+        message: "You have already applied to this opportunity",
+      });
+    }
+
+    // Create application
+    const application = await Application.create({
+      applicant: applicantId,
+      opportunity: opportunityId,
+    });
+
+    // Create notification for the opportunity creator (manager/admin)
+    const notification = await Notification.create({
+      recipient: opportunity.createdBy._id,
+      type: "job_application",
+      referenceId: opportunityId,
+      actor: applicantId,
+    });
+
+    // Emit real-time notification via Socket.IO
+    if (global.io) {
+      global.io.to(opportunity.createdBy._id.toString()).emit("notification", {
+        type: "job_application",
+        message: `${req.user.username} applied to your opportunity: ${opportunity.title}`,
+        opportunityId: opportunityId,
+        applicantName: req.user.username,
+      });
+    }
+
+    res.status(201).json({
+      success: true,
+      message: "Application submitted successfully",
+      data: {
+        application,
+      },
+    });
+  } catch (error) {
+    // Handle duplicate key error from unique index
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "You have already applied to this opportunity",
+      });
+    }
+    next(error);
+  }
+};
+

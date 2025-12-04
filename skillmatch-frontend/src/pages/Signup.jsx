@@ -10,6 +10,7 @@ const Signup = () => {
     email: '',
     password: '',
     passwordConfirm: '',
+    role: 'user', // Default to user role
   });
   const [isLoading, setIsLoading] = useState(false);
   const { signup } = useAuth();
@@ -29,7 +30,7 @@ const Signup = () => {
     const success = await signup(formData);
     setIsLoading(false);
     if (success) {
-      navigate('/verify-email', { state: { email: formData.email } }); 
+      navigate('/verify-email', { state: { email: formData.email } });
     }
   };
 
@@ -133,6 +134,45 @@ const Signup = () => {
                   value={formData.passwordConfirm}
                   onChange={handleChange}
                 />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Account Type</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, role: 'user' })}
+                  className={`p-4 border-2 rounded-lg transition-all ${formData.role === 'user' || !formData.role
+                    ? 'border-primary-600 bg-primary-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                >
+                  <User className={`w-6 h-6 mx-auto mb-2 ${formData.role === 'user' || !formData.role ? 'text-primary-600' : 'text-gray-400'
+                    }`} />
+                  <p className={`text-sm font-medium ${formData.role === 'user' || !formData.role ? 'text-primary-600' : 'text-gray-700'
+                    }`}>
+                    User
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Apply to opportunities</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, role: 'manager' })}
+                  className={`p-4 border-2 rounded-lg transition-all ${formData.role === 'manager'
+                    ? 'border-primary-600 bg-primary-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                >
+                  <User className={`w-6 h-6 mx-auto mb-2 ${formData.role === 'manager' ? 'text-primary-600' : 'text-gray-400'
+                    }`} />
+                  <p className={`text-sm font-medium ${formData.role === 'manager' ? 'text-primary-600' : 'text-gray-700'
+                    }`}>
+                    Manager
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Post opportunities & hire</p>
+                </button>
               </div>
             </div>
 
