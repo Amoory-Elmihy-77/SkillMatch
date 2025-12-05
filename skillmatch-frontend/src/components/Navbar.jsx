@@ -1,16 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Search,
-  Bell,
-  Menu,
-  X,
-  LogOut,
-  User,
-  Heart,
-  Users,
-  Sparkles,
-} from "lucide-react";
+import { Search, Menu, X, Heart, Users, Sparkles } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { getUserAvatarUrl } from "../utils/avatar";
 import NotificationsPanel from "./NotificationsPanel";
@@ -65,7 +55,7 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Center Search Bar - Only for authenticated users */}
+          {/* Search Bar - Only for authenticated users */}
           {isAuthenticated && (
             <div className="hidden md:flex flex-1 items-center justify-center px-4 md:px-8">
               <form
@@ -147,7 +137,9 @@ const Navbar = () => {
                         <>
                           <div className="border-t border-gray-100 my-1"></div>
                           <div className="px-4 py-2">
-                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Manager</p>
+                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                              Manager
+                            </p>
                           </div>
                           <Link
                             to="/manager/dashboard"
@@ -178,7 +170,9 @@ const Navbar = () => {
                         <>
                           <div className="border-t border-gray-100 my-1"></div>
                           <div className="px-4 py-2">
-                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Admin</p>
+                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                              Admin
+                            </p>
                           </div>
                           <Link
                             to="/admin/dashboard"

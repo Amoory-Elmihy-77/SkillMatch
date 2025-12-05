@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import api from '../services/api';
-import { User, Mail, MapPin, Briefcase, Edit2, Save, X, Camera, Plus } from 'lucide-react';
-import { getUserAvatarUrl } from '../utils/avatar';
-import toast from 'react-hot-toast';
+import React, { useState, useEffect, useRef } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import api from "../services/api";
+import { Mail, MapPin, Edit2, Save, X, Camera } from "lucide-react";
+import { getUserAvatarUrl } from "../utils/avatar";
+import toast from "react-hot-toast";
 
 const Profile = () => {
   const { user, updateProfile, setUser } = useAuth();
@@ -11,23 +11,23 @@ const Profile = () => {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    bio: '',
-    location: '',
+    username: "",
+    email: "",
+    bio: "",
+    location: "",
     skills: [],
     interests: [],
   });
-  const [newSkill, setNewSkill] = useState('');
-  const [newInterest, setNewInterest] = useState('');
+  const [newSkill, setNewSkill] = useState("");
+  const [newInterest, setNewInterest] = useState("");
 
   useEffect(() => {
     if (user) {
       setFormData({
-        username: user.username || '',
-        email: user.email || '',
-        bio: user.bio || '',
-        location: user.location || '',
+        username: user.username || "",
+        email: user.email || "",
+        bio: user.bio || "",
+        location: user.location || "",
         skills: user.skills || [],
         interests: user.interests || [],
       });
@@ -38,32 +38,33 @@ const Profile = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image size should be less than 5MB');
+      toast.error("Image size should be less than 5MB");
       return;
     }
 
     setUploading(true);
     const formDataToSend = new FormData();
-    formDataToSend.append('photo', file);
+    formDataToSend.append("photo", file);
 
     try {
-      const response = await api.patch('/auth/updateMyPhoto', formDataToSend, {
+      const response = await api.patch("/auth/updateMyPhoto", formDataToSend, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
-      
+
       setUser(response.data.data.user);
-      toast.success('Profile photo updated successfully!');
+      toast.success("Profile photo updated successfully!");
     } catch (error) {
-      console.error('Photo upload failed:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to upload photo';
+      console.error("Photo upload failed:", error);
+      const errorMessage =
+        error.response?.data?.message || "Failed to upload photo";
       toast.error(errorMessage);
     } finally {
       setUploading(false);
@@ -77,25 +78,40 @@ const Profile = () => {
   const handleAddSkill = (e) => {
     e.preventDefault();
     if (newSkill.trim() && !formData.skills.includes(newSkill.trim())) {
-      setFormData({ ...formData, skills: [...formData.skills, newSkill.trim()] });
-      setNewSkill('');
+      setFormData({
+        ...formData,
+        skills: [...formData.skills, newSkill.trim()],
+      });
+      setNewSkill("");
     }
   };
 
   const handleRemoveSkill = (skillToRemove) => {
-    setFormData({ ...formData, skills: formData.skills.filter(s => s !== skillToRemove) });
+    setFormData({
+      ...formData,
+      skills: formData.skills.filter((s) => s !== skillToRemove),
+    });
   };
 
   const handleAddInterest = (e) => {
     e.preventDefault();
-    if (newInterest.trim() && !formData.interests.includes(newInterest.trim())) {
-      setFormData({ ...formData, interests: [...formData.interests, newInterest.trim()] });
-      setNewInterest('');
+    if (
+      newInterest.trim() &&
+      !formData.interests.includes(newInterest.trim())
+    ) {
+      setFormData({
+        ...formData,
+        interests: [...formData.interests, newInterest.trim()],
+      });
+      setNewInterest("");
     }
   };
 
   const handleRemoveInterest = (interestToRemove) => {
-    setFormData({ ...formData, interests: formData.interests.filter(i => i !== interestToRemove) });
+    setFormData({
+      ...formData,
+      interests: formData.interests.filter((i) => i !== interestToRemove),
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -135,7 +151,7 @@ const Profile = () => {
                   onChange={handlePhotoUpload}
                   className="hidden"
                 />
-                <button 
+                <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
                   className="absolute bottom-0 right-0 p-1.5 bg-white rounded-full shadow-sm border border-gray-200 text-gray-600 hover:text-primary-600 disabled:opacity-50"
@@ -144,7 +160,7 @@ const Profile = () => {
                   <Camera className="w-4 h-4" />
                 </button>
               </div>
-              
+
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
@@ -177,7 +193,9 @@ const Profile = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Username
+                    </label>
                     <input
                       type="text"
                       name="username"
@@ -187,7 +205,9 @@ const Profile = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email
+                    </label>
                     <input
                       type="email"
                       name="email"
@@ -198,7 +218,9 @@ const Profile = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Location
+                    </label>
                     <input
                       type="text"
                       name="location"
@@ -209,7 +231,9 @@ const Profile = () => {
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Bio
+                    </label>
                     <textarea
                       name="bio"
                       rows="3"
@@ -223,10 +247,15 @@ const Profile = () => {
 
                 {/* Skills */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Skills</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Skills
+                  </label>
                   <div className="flex flex-wrap gap-2 mb-3">
                     {formData.skills.map((skill, index) => (
-                      <span key={index} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+                      >
                         {skill}
                         <button
                           type="button"
@@ -258,10 +287,15 @@ const Profile = () => {
 
                 {/* Interests */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Interests</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Interests
+                  </label>
                   <div className="flex flex-wrap gap-2 mb-3">
                     {formData.interests.map((interest, index) => (
-                      <span key={index} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
+                      >
                         {interest}
                         <button
                           type="button"
@@ -294,7 +328,9 @@ const Profile = () => {
             ) : (
               <div className="space-y-6">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">{user?.username}</h1>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    {user?.username}
+                  </h1>
                   <div className="flex items-center gap-4 text-gray-500 mt-1">
                     <div className="flex items-center gap-1">
                       <Mail className="w-4 h-4" />
@@ -311,37 +347,53 @@ const Profile = () => {
 
                 {user?.bio && (
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">About</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      About
+                    </h3>
                     <p className="text-gray-600 leading-relaxed">{user.bio}</p>
                   </div>
                 )}
 
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Skills</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                    Skills
+                  </h3>
                   <div className="flex flex-wrap gap-2">
                     {user?.skills?.length > 0 ? (
                       user.skills.map((skill, index) => (
-                        <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+                        >
                           {skill}
                         </span>
                       ))
                     ) : (
-                      <p className="text-gray-500 text-sm italic">No skills added yet.</p>
+                      <p className="text-gray-500 text-sm italic">
+                        No skills added yet.
+                      </p>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Interests</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                    Interests
+                  </h3>
                   <div className="flex flex-wrap gap-2">
                     {user?.interests?.length > 0 ? (
                       user.interests.map((interest, index) => (
-                        <span key={index} className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm">
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm"
+                        >
                           {interest}
                         </span>
                       ))
                     ) : (
-                      <p className="text-gray-500 text-sm italic">No interests added yet.</p>
+                      <p className="text-gray-500 text-sm italic">
+                        No interests added yet.
+                      </p>
                     )}
                   </div>
                 </div>

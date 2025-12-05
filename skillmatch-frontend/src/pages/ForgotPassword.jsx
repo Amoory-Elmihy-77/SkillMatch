@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import api from '../services/api';
-import { Mail, ArrowLeft, Loader2 } from 'lucide-react';
-import toast from 'react-hot-toast';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import api from "../services/api";
+import { Mail, ArrowLeft, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);
 
@@ -13,11 +13,11 @@ const ForgotPassword = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await api.post('/auth/forgotPassword', { email });
+      await api.post("/auth/forgotPassword", { email });
       setIsSent(true);
-      toast.success('Reset code sent to your email');
+      toast.success("Reset code sent to your email");
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to send reset code');
+      toast.error(error.response?.data?.message || "Failed to send reset code");
     } finally {
       setIsLoading(false);
     }
@@ -30,7 +30,9 @@ const ForgotPassword = () => {
           <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Mail className="w-6 h-6 text-primary-600" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Forgot Password?</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Forgot Password?
+          </h2>
           <p className="text-gray-500 text-sm">
             No worries, we'll send you reset instructions.
           </p>
@@ -39,7 +41,8 @@ const ForgotPassword = () => {
         {isSent ? (
           <div className="text-center">
             <p className="text-green-600 bg-green-50 p-4 rounded-lg mb-6 text-sm">
-              If an account exists for {email}, we have sent a password reset code.
+              If an account exists for {email}, we have sent a password reset
+              code.
             </p>
             <Link
               to="/reset-password"
@@ -51,7 +54,9 @@ const ForgotPassword = () => {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-gray-400" />
@@ -75,14 +80,17 @@ const ForgotPassword = () => {
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                'Send Reset Code'
+                "Send Reset Code"
               )}
             </button>
           </form>
         )}
 
         <div className="mt-6 text-center">
-          <Link to="/login" className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900">
+          <Link
+            to="/login"
+            className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to log in
           </Link>

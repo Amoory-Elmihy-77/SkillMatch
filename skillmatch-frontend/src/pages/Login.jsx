@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { Mail, Lock, Loader2 } from 'lucide-react';
+import React, { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { Mail, Lock, Loader2 } from "lucide-react";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || '/';
+  const from = location.state?.from?.pathname || "/";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,9 +30,12 @@ const Login = () => {
         <div className="md:w-1/2 bg-primary-600 p-12 text-white flex flex-col justify-center relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary-600 to-primary-800 opacity-90"></div>
           <div className="relative z-10">
-            <h2 className="text-4xl font-bold mb-6">Discover Opportunities That Match Your Skills</h2>
+            <h2 className="text-4xl font-bold mb-6">
+              Discover Opportunities That Match Your Skills
+            </h2>
             <p className="text-primary-100 text-lg mb-8">
-              Connecting creative professionals with freelance jobs, courses, and tools to elevate their careers.
+              Connecting creative professionals with freelance jobs, courses,
+              and tools to elevate their careers.
             </p>
           </div>
           {/* Decorative circles */}
@@ -47,15 +50,23 @@ const Login = () => {
               <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
                 <div className="w-4 h-4 border-2 border-white rounded-full"></div>
               </div>
-              <span className="text-xl font-bold text-primary-600">SkillMatch</span>
+              <span className="text-xl font-bold text-primary-600">
+                SkillMatch
+              </span>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Login to your account</h2>
-            <p className="text-gray-500">Welcome back! Please enter your details.</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Login to your account
+            </h2>
+            <p className="text-gray-500">
+              Welcome back! Please enter your details.
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-gray-400" />
@@ -72,7 +83,9 @@ const Login = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-gray-400" />
@@ -96,13 +109,19 @@ const Login = () => {
                   type="checkbox"
                   className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                <label
+                  htmlFor="remember-me"
+                  className="ml-2 block text-sm text-gray-900"
+                >
                   Remember me
                 </label>
               </div>
 
               <div className="text-sm">
-                <Link to="/forgot-password" className="font-medium text-primary-600 hover:text-primary-500">
+                <Link
+                  to="/forgot-password"
+                  className="font-medium text-primary-600 hover:text-primary-500"
+                >
                   Forgot Password?
                 </Link>
               </div>
@@ -116,15 +135,18 @@ const Login = () => {
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                'Login'
+                "Login"
               )}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link to="/signup" className="font-medium text-primary-600 hover:text-primary-500">
+              Don't have an account?{" "}
+              <Link
+                to="/signup"
+                className="font-medium text-primary-600 hover:text-primary-500"
+              >
                 Sign up
               </Link>
             </p>

@@ -1,11 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import api from '../services/api';
-import Loader from '../components/Loader';
-import { MapPin, Clock, DollarSign, Globe, Share2, Bookmark, ArrowLeft } from 'lucide-react';
-import toast from 'react-hot-toast';
-import { useAuth } from '../contexts/AuthContext';
-import ApplicationButton from '../components/ApplicationButton';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import api from "../services/api";
+import Loader from "../components/Loader";
+import {
+  MapPin,
+  Clock,
+  DollarSign,
+  Globe,
+  Share2,
+  Bookmark,
+  ArrowLeft,
+} from "lucide-react";
+import toast from "react-hot-toast";
+import { useAuth } from "../contexts/AuthContext";
+import ApplicationButton from "../components/ApplicationButton";
 
 const OpportunityDetails = () => {
   const { id } = useParams();
@@ -27,13 +35,14 @@ const OpportunityDetails = () => {
 
   const checkIfSaved = async () => {
     try {
-      const response = await api.get('/auth/me/saved');
+      const response = await api.get("/auth/me/saved");
       const savedOpps = response.data.data?.savedOpportunities || [];
-      const isCurrentlySaved = savedOpps.some(opp => opp._id === opportunity._id);
+      const isCurrentlySaved = savedOpps.some(
+        (opp) => opp._id === opportunity._id
+      );
       setIsSaved(isCurrentlySaved);
     } catch (error) {
-      console.error('Failed to check saved status:', error);
-      // Fallback to user object if available
+      console.error("Failed to check saved status:", error);
       setIsSaved(user?.savedOpportunities?.includes(opportunity._id) || false);
     }
   };
@@ -44,9 +53,9 @@ const OpportunityDetails = () => {
       const response = await api.get(`/opportunities/${id}`);
       setOpportunity(response.data.data.opportunity);
     } catch (error) {
-      console.error('Failed to fetch opportunity', error);
-      toast.error('Failed to load opportunity details');
-      navigate('/opportunities');
+      console.error("Failed to fetch opportunity", error);
+      toast.error("Failed to load opportunity details");
+      navigate("/opportunities");
     } finally {
       setLoading(false);
     }
@@ -54,21 +63,21 @@ const OpportunityDetails = () => {
 
   const handleSave = async () => {
     if (!user) {
-      toast.error('Please login to save');
+      toast.error("Please login to save");
       return;
     }
     try {
       if (isSaved) {
         await api.delete(`/opportunities/unsave/${opportunity._id}`);
-        toast.success('Removed from saved');
+        toast.success("Removed from saved");
         setIsSaved(false);
       } else {
         await api.post(`/opportunities/save/${opportunity._id}`);
-        toast.success('Saved successfully');
+        toast.success("Saved successfully");
         setIsSaved(true);
       }
     } catch (error) {
-      toast.error('Failed to update saved status');
+      toast.error("Failed to update saved status");
     }
   };
 
@@ -84,16 +93,16 @@ const OpportunityDetails = () => {
       // Use Web Share API if available (mobile devices)
       if (navigator.share) {
         await navigator.share(shareData);
-        toast.success('Shared successfully!');
+        toast.success("Shared successfully!");
       } else {
         // Fallback: Copy to clipboard
         await navigator.clipboard.writeText(shareUrl);
-        toast.success('Link copied to clipboard!');
+        toast.success("Link copied to clipboard!");
       }
     } catch (error) {
-      if (error.name !== 'AbortError') {
-        console.error('Failed to share:', error);
-        toast.error('Failed to share');
+      if (error.name !== "AbortError") {
+        console.error("Failed to share:", error);
+        toast.error("Failed to share");
       }
     }
   };
@@ -117,22 +126,36 @@ const OpportunityDetails = () => {
           <div className="p-8 border-b border-gray-100">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-4 ${opportunity.type === 'job' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700'
-                  }`}>
-                  {opportunity.type === 'job' ? 'Job Opportunity' : 'Learning Resource'}
+                <div
+                  className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-4 ${
+                    opportunity.type === "job"
+                      ? "bg-blue-50 text-blue-700"
+                      : "bg-purple-50 text-purple-700"
+                  }`}
+                >
+                  {opportunity.type === "job"
+                    ? "Job Opportunity"
+                    : "Learning Resource"}
                 </div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{opportunity.title}</h1>
-                <p className="text-xl text-gray-600">{opportunity.company || 'Unknown Provider'}</p>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  {opportunity.title}
+                </h1>
+                <p className="text-xl text-gray-600">
+                  {opportunity.company || "Unknown Provider"}
+                </p>
               </div>
               <div className="flex gap-3">
                 <button
                   onClick={handleSave}
-                  className={`p-3 rounded-lg border transition-colors ${isSaved
-                    ? 'bg-primary-50 border-primary-200 text-primary-600'
-                    : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
-                    }`}
+                  className={`p-3 rounded-lg border transition-colors ${
+                    isSaved
+                      ? "bg-primary-50 border-primary-200 text-primary-600"
+                      : "bg-white border-gray-200 text-gray-500 hover:bg-gray-50"
+                  }`}
                 >
-                  <Bookmark className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`} />
+                  <Bookmark
+                    className={`w-5 h-5 ${isSaved ? "fill-current" : ""}`}
+                  />
                 </button>
                 <button
                   onClick={handleShare}
@@ -167,17 +190,24 @@ const OpportunityDetails = () => {
           <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2 space-y-8">
               <section>
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Description</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">
+                  Description
+                </h2>
                 <div className="prose prose-blue max-w-none text-gray-600">
                   <p>{opportunity.description}</p>
                 </div>
               </section>
 
               <section>
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Required Skills</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">
+                  Required Skills
+                </h2>
                 <div className="flex flex-wrap gap-2">
                   {opportunity.skills?.map((skill, index) => (
-                    <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm">
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm"
+                    >
                       {skill}
                     </span>
                   ))}
@@ -188,7 +218,9 @@ const OpportunityDetails = () => {
             {/* Sidebar */}
             <div className="space-y-6">
               <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="font-bold text-gray-900 mb-4">Apply to this Opportunity</h3>
+                <h3 className="font-bold text-gray-900 mb-4">
+                  Apply to this Opportunity
+                </h3>
                 <p className="text-sm text-gray-600 mb-6">
                   Submit your application and track its status here.
                 </p>
@@ -196,14 +228,23 @@ const OpportunityDetails = () => {
               </div>
 
               <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="font-bold text-gray-900 mb-4">About the Company</h3>
+                <h3 className="font-bold text-gray-900 mb-4">
+                  About the Company
+                </h3>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-gray-200">
                     <Globe className="w-5 h-5 text-gray-400" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">{opportunity.company}</p>
-                    <a href="#" className="text-xs text-primary-600 hover:underline">Visit Website</a>
+                    <p className="font-medium text-gray-900">
+                      {opportunity.company}
+                    </p>
+                    <a
+                      href="#"
+                      className="text-xs text-primary-600 hover:underline"
+                    >
+                      Visit Website
+                    </a>
                   </div>
                 </div>
               </div>

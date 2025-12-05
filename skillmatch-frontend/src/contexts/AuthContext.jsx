@@ -1,9 +1,10 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import api from '../services/api';
-import toast from 'react-hot-toast';
+import React, { createContext, useState, useEffect, useContext } from "react";
+import api from "../services/api";
+import toast from "react-hot-toast";
 
 const AuthContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
@@ -12,24 +13,26 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchMe = async () => {
-      const token = localStorage.getItem('token');
-      console.log('Token from localStorage:', token ? 'exists' : 'not found');
-      
+      const token = localStorage.getItem("token");
+      console.log("Token from localStorage:", token ? "exists" : "not found");
+
       if (token) {
         try {
-          const response = await api.get('/auth/me');
-          console.log('User fetched successfully:', response.data);
+          const response = await api.get("/auth/me");
+          console.log("User fetched successfully:", response.data);
           setUser(response.data.data?.user || response.data.user);
         } catch (error) {
-          console.error('Failed to fetch user:', error.response?.status, error.response?.data);
-          
-          // Only remove token if it's actually invalid (401)
-          // Don't remove on network errors or other issues
+          console.error(
+            "Failed to fetch user:",
+            error.response?.status,
+            error.response?.data
+          );
+
           if (error.response?.status === 401) {
-            console.log('Token is invalid, removing from localStorage');
-            localStorage.removeItem('token');
+            console.log("Token is invalid, removing from localStorage");
+            localStorage.removeItem("token");
           } else {
-            console.log('Network or server error, keeping token');
+            console.log("Network or server error, keeping token");
           }
         }
       }
@@ -41,79 +44,81 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await api.post('/auth/login', { email, password });
-      
-      console.log('Login response:', response.data);
-      
-      // API returns: { status: 'success', token: '...', data: { user: {...} } }
+      const response = await api.post("/auth/login", { email, password });
+
+      console.log("Login response:", response.data);
+
       const token = response.data.token;
       const user = response.data.data?.user || response.data.user;
-      
-      console.log('Extracted user:', user);
-      console.log('User role:', user?.role);
-      
+
+      console.log("Extracted user:", user);
+      console.log("User role:", user?.role);
+
       if (!token) {
-        console.error('No token found in response! Response structure:', response.data);
-        toast.error('Login failed: No token received');
+        console.error(
+          "No token found in response! Response structure:",
+          response.data
+        );
+        toast.error("Login failed: No token received");
         return false;
       }
-      
-      localStorage.setItem('token', token);
+
+      localStorage.setItem("token", token);
       setUser(user);
-      toast.success('Logged in successfully!');
+      toast.success("Logged in successfully!");
       return true;
     } catch (error) {
-      console.error('Login failed', error);
-      toast.error(error.response?.data?.message || 'Login failed');
+      console.error("Login failed", error);
+      toast.error(error.response?.data?.message || "Login failed");
       return false;
     }
   };
 
   const signup = async (userData) => {
     try {
-      const response = await api.post('/auth/signup', userData);
-      if (response.data.status === 'success') {
-        toast.success('Signup successful! Please verify your email.');
+      const response = await api.post("/auth/signup", userData);
+      if (response.data.status === "success") {
+        toast.success("Signup successful! Please verify your email.");
         return true;
       }
       return false;
     } catch (error) {
-      console.error('Signup failed', error);
-      toast.error(error.response?.data?.message || 'Signup failed');
+      console.error("Signup failed", error);
+      toast.error(error.response?.data?.message || "Signup failed");
       return false;
     }
   };
 
   const verify = async (email, code) => {
     try {
-      const response = await api.post('/auth/verify', { email, code });
+      const response = await api.post("/auth/verify", { email, code });
       const { token, user } = response.data;
-      localStorage.setItem('token', token);
+      localStorage.setItem("token", token);
       setUser(user);
-      toast.success('Email verified successfully!');
+      toast.success("Email verified successfully!");
       return true;
     } catch (error) {
-      console.error('Verification failed', error);
-      toast.error(error.response?.data?.message || 'Verification failed');
+      console.error("Verification failed", error);
+      toast.error(error.response?.data?.message || "Verification failed");
       return false;
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setUser(null);
-    toast.success('Logged out successfully');
+    toast.success("Logged out successfully");
   };
 
   const updateProfile = async (data) => {
     try {
-      const response = await api.patch('/auth/updateMe', data);
+      const response = await api.patch("/auth/updateMe", data);
       setUser(response.data.data.user);
-      toast.success('Profile updated successfully');
+      toast.success("Profile updated successfully");
       return true;
     } catch (error) {
-      console.error('Update failed', error);
-      toast.error(error.response?.data?.message || 'Update failed');
+      console.error("Update failed", error);
+      toast.error(error.response?.data?.message || "Update failed");
       return false;
     }
   };
@@ -128,7 +133,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateProfile,
     isAuthenticated: !!user,
-    isAdmin: user?.role === 'admin',
+    isAdmin: user?.role === "admin",
   };
 
   return (
