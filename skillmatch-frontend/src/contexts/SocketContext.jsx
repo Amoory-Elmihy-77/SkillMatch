@@ -39,18 +39,18 @@ export const SocketProvider = ({ children }) => {
       return;
     }
 
-    const SOCKET_URL =
-      import.meta.env.VITE_SOCKET_URL || "http://localhost:4000";
+    const SOCKET_URL = "https://skillmatch.elmihy.me";
 
     console.log("Establishing socket connection for user:", user._id);
 
     const newSocket = io(SOCKET_URL, {
-      query: { userId: user._id },
-      transports: ["websocket", "polling"],
-      reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionAttempts: 5,
-    });
+	 path: "/socket.io",
+	transports: ["websocket"],
+	query: { userId: user._id },
+	 reconnection: true,
+	 reconnectionDelay: 1000,
+	reconnectionAttempts: 5,
+	});
 
     newSocket.on("connect", () => {
       console.log("Socket connected:", newSocket.id);

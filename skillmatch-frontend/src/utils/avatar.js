@@ -7,10 +7,10 @@ export const getUserAvatarUrl = (user) => {
     }
 
     if (user.photo.startsWith("/img/")) {
-      return `http://localhost:4000${user.photo}`;
+      return `/api${user.photo}`;
     }
 
-    return `http://localhost:4000/img/users/${user.photo}`;
+    return `/api/img/users/${user.photo}`;
   }
 
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(
