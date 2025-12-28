@@ -36,9 +36,9 @@ const ConnectionButton = ({ userId, initialStatus = null, onStatusChange }) => {
 
     setLoading(true);
     try {
-      // const response = await api.post('/connections/send', {
-      //   receiverId: userId,
-      // });
+      await api.post("/connections/send", {
+        receiverId: userId,
+      });
 
       setStatus("pending");
       toast.success("Connection request sent!");
