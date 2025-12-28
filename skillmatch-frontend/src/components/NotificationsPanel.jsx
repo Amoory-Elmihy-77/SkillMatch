@@ -31,14 +31,6 @@ const NotificationsPanel = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Removed automatic refetch when opening panel to preserve real-time notifications
-  // The notifications are already fetched on mount and updated via Socket.io
-  // useEffect(() => {
-  //   if (isOpen) {
-  //     fetchNotifications();
-  //   }
-  // }, [isOpen, fetchNotifications]);
-
   const handleAcceptConnection = async (notification) => {
     const connectionId =
       notification.referenceId ||
@@ -54,14 +46,11 @@ const NotificationsPanel = () => {
       return;
     }
 
-    console.log("Accepting connection:", connectionId);
     setProcessing((prev) => ({ ...prev, [notification._id]: true }));
     try {
       await api.post(`/connections/${connectionId}/accept`);
       toast.success("Connection request accepted!");
-
       await markAsRead(notification._id);
-
       removeNotification(notification._id);
     } catch (error) {
       console.error("Failed to accept connection:", error);
@@ -86,14 +75,11 @@ const NotificationsPanel = () => {
       return;
     }
 
-    console.log("Rejecting connection:", connectionId);
     setProcessing((prev) => ({ ...prev, [notification._id]: true }));
     try {
       await api.post(`/connections/${connectionId}/reject`);
       toast.success("Connection request rejected");
-
       await markAsRead(notification._id);
-
       removeNotification(notification._id);
     } catch (error) {
       console.error("Failed to reject connection:", error);
@@ -126,6 +112,16 @@ const NotificationsPanel = () => {
     }
   };
 
+  const getDisplayName = (notification) => {
+    return (
+      notification.actor?.name ||
+      notification.actor?.username ||
+      notification.sender?.name ||
+      notification.sender?.username ||
+      "Someone"
+    );
+  };
+
   const renderNotificationContent = (notification) => {
     const isProcessingThis = processing[notification._id];
 
@@ -134,17 +130,19 @@ const NotificationsPanel = () => {
         return (
           <div className="space-y-2">
             <div className="flex items-start gap-3">
-              {notification.sender?.photo && (
+              {(notification.actor?.photo || notification.sender?.photo) && (
                 <img
-                  src={getUserAvatarUrl(notification.sender)}
-                  alt={notification.sender.name}
+                  src={getUserAvatarUrl(
+                    notification.actor || notification.sender
+                  )}
+                  alt={getDisplayName(notification)}
                   className="w-10 h-10 rounded-full object-cover"
                 />
               )}
               <div className="flex-1">
                 <p className="text-sm text-gray-900">
                   <span className="font-semibold">
-                    {notification.sender?.name || "Someone"}
+                    {getDisplayName(notification)}
                   </span>{" "}
                   sent you a connection request
                 </p>
@@ -188,17 +186,19 @@ const NotificationsPanel = () => {
       case "connection_accepted":
         return (
           <div className="flex items-start gap-3">
-            {notification.sender?.photo && (
+            {(notification.actor?.photo || notification.sender?.photo) && (
               <img
-                src={getUserAvatarUrl(notification.sender)}
-                alt={notification.sender.name}
+                src={getUserAvatarUrl(
+                  notification.actor || notification.sender
+                )}
+                alt={getDisplayName(notification)}
                 className="w-10 h-10 rounded-full object-cover"
               />
             )}
             <div>
               <p className="text-sm text-gray-900">
                 <span className="font-semibold">
-                  {notification.sender?.name || "Someone"}
+                  {getDisplayName(notification)}
                 </span>{" "}
                 accepted your connection request
               </p>
@@ -212,10 +212,12 @@ const NotificationsPanel = () => {
       case "job_application":
         return (
           <div className="flex items-start gap-3">
-            {notification.sender?.photo && (
+            {(notification.actor?.photo || notification.sender?.photo) && (
               <img
-                src={getUserAvatarUrl(notification.sender)}
-                alt={notification.sender.name}
+                src={getUserAvatarUrl(
+                  notification.actor || notification.sender
+                )}
+                alt={getDisplayName(notification)}
                 className="w-10 h-10 rounded-full object-cover"
               />
             )}
@@ -224,7 +226,7 @@ const NotificationsPanel = () => {
                 {notification.message || (
                   <>
                     <span className="font-semibold">
-                      {notification.sender?.name || "Someone"}
+                      {getDisplayName(notification)}
                     </span>{" "}
                     {notification.type === "job_application" &&
                     notification.status
