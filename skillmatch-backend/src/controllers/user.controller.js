@@ -196,14 +196,30 @@ exports.updateProfilePhoto = async (req, res) => {
 exports.getSuggestedUsers = async (req, res, next) => {
   const currentUserId = req.user.id;
 
+  // pagination
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 10;
+  const skip = (page - 1) * limit;
+
   try {
     const users = await User.find({
       _id: { $ne: currentUserId },
     })
       .select("email username title photo")
-      .limit(10);
+      .skip(skip)
+      .limit(limit);
 
-    res.status(200).json({ users });
+    const totalUsers = await User.countDocuments({
+      _id: { $ne: currentUserId },
+    });
+
+    res.status(200).json({
+      page,
+      limit,
+      totalPages: Math.ceil(totalUsers / limit),
+      totalUsers,
+      users,
+    });
   } catch (error) {
     next(error);
   }

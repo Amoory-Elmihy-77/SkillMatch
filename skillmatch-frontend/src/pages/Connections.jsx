@@ -167,44 +167,50 @@ const Connections = () => {
                   {pendingRequests.map((request) => (
                     <div
                       key={request._id}
-                      className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="flex items-center justify-between p-4 border rounded-lg"
                     >
                       <div className="flex items-center gap-4">
                         <img
-                          src={getUserAvatarUrl(request.sender)}
-                          alt={request.sender?.name}
-                          className="w-14 h-14 rounded-full object-cover border-2 border-gray-200"
+                          src={getUserAvatarUrl(request.user)}
+                          alt={request.user?.name}
+                          className="w-14 h-14 rounded-full"
                         />
                         <div>
-                          <h3 className="font-semibold text-gray-900">
-                            {request.sender?.name}
+                          <h3 className="font-semibold">
+                            {request.user?.name}
                           </h3>
                           <p className="text-sm text-gray-500">
-                            @{request.sender?.username}
+                            @{request.user?.username}
                           </p>
-                          {request.sender?.bio && (
-                            <p className="text-sm text-gray-600 mt-1 line-clamp-1">
-                              {request.sender.bio}
+
+                          {/* 👇 الحالة */}
+                          {request.type === "sent" && (
+                            <p className="text-sm text-yellow-600 mt-1">
+                              Waiting for response
                             </p>
                           )}
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleAccept(request._id)}
-                          disabled={processing[request._id]}
-                          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 text-sm font-medium"
-                        >
-                          Accept
-                        </button>
-                        <button
-                          onClick={() => handleReject(request._id)}
-                          disabled={processing[request._id]}
-                          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 text-sm font-medium"
-                        >
-                          Reject
-                        </button>
-                      </div>
+
+                      {/* 👇 أزرار accept / reject بس لو الطلب جاي لي */}
+                      {request.type === "received" && (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleAccept(request._id)}
+                            disabled={processing[request._id]}
+                            className="px-4 py-2 bg-primary-600 text-white rounded-lg"
+                          >
+                            Accept
+                          </button>
+                          <button
+                            onClick={() => handleReject(request._id)}
+                            disabled={processing[request._id]}
+                            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

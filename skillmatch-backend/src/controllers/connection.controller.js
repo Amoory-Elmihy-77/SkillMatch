@@ -161,9 +161,17 @@ exports.getPendingConnections = async (req, res, next) => {
       .populate("sender", "name username photo title")
       .populate("receiver", "name username photo title");
 
-    res
-      .status(200)
-      .json({ status: "success", connections: pendingConnections });
+    const formatted = pendingConnections.map((conn) => {
+      const isSender = conn.sender._id.toString() === userId;
+
+      return {
+        ...conn.toObject(),
+        type: isSender ? "sent" : "received",
+        user: isSender ? conn.receiver : conn.sender,
+      };
+    });
+
+    res.status(200).json({ status: "success", connections: formatted });
   } catch (error) {
     next(error);
   }
